@@ -77,6 +77,7 @@ func applyMoveChain(e *factom.Entry, p *common.Pension) *common.Transaction {
 		return nil
 	}
 	p.Value += t.ValueChange
+	return t
 }
 
 func applyRequestChain(e *factom.Entry, p *common.Pension) *common.Transaction {
@@ -104,11 +105,12 @@ func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
 	buf := new(bytes.Buffer)
 
 	t := new(common.Transaction)
-	t.UserType, err = primitives.BytesToUint32(e.ExtIDs[1])
+	ut, err := primitives.BytesToUint32(e.ExtIDs[1])
 	if err != nil {
 		log.Println("Usetype fail")
 		return nil
 	}
+	t.UserType = ut
 
 	valC, err := primitives.BytesToUint32(e.ExtIDs[2])
 	if err != nil {

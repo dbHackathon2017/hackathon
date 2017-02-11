@@ -22,13 +22,23 @@ type FakeCompany struct {
 type PensionAndMetadata struct {
 	PensionID  primitives.Hash
 	SigningKey primitives.PrivateKey
-	// Other personal info and metadata
+
+	// Client
+	FirstName   string
+	LastName    string
+	Address     string
+	PhoneNumber string
+	CompanyName string
+	SSN         string
+
+	AccountNumber string
 }
 
 func RandomFakeCompay() *FakeCompany {
 	fc := new(FakeCompany)
 	fc.CompanyName = *primitives.RandomName()
-	fc.SigningKey = *primitives.RandomPrivateKey()
+	sec, _ := primitives.RandomPrivateKey()
+	fc.SigningKey = *sec
 	fc.Pensions = make([]*PensionAndMetadata, 0)
 
 	return fc
@@ -44,7 +54,7 @@ func (fc *FakeCompany) CreatePension() (primitives.Hash, error) {
 	p.Company = fc.CompanyName
 
 	ec := write.GetECAddress()
-	penID, err := write.SubmitPensionToFactom(p, ec)
+	_, err := write.SubmitPensionToFactom(p, ec)
 	if err != nil {
 		return *primitives.NewZeroHash(), err
 	}

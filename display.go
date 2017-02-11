@@ -8,11 +8,18 @@ import (
 	"strings"
 	"sync"
 	"text/template"
+
+	"github.com/FactomProject/factom"
+	"github.com/dbHackathon2017/hackathon/common/constants"
+	"github.com/dbHackathon2017/hackathon/common/primitives"
+	"github.com/dbHackathon2017/hackathon/company"
 )
 
 var (
-	FILES_PATH string = "web/"
+	FILES_PATH string = "../hackathon2"
 	templates  *template.Template
+
+	MainCompany *company.FakeCompany
 
 	mux           *http.ServeMux
 	TemplateMutex sync.Mutex
@@ -28,8 +35,28 @@ func InitTemplate() {
 }
 
 func ServeFrontEnd(port int) {
+	factom.SetFactomdServer(constants.REMOTE_HOST)
 	// Templates
 	InitTemplate()
+
+	MainCompany = company.RandomFakeCompay()
+	if MAKE_TRANS {
+		for i := 0; i < 3; i++ {
+			penId, err := MainCompany.CreatePension()
+			if err != nil {
+				panic(err)
+			}
+
+			MainCompany.Pensions[i].AddValue(100, "Steven WOOT!", *primitives.RandomFileList(10))
+			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10))
+			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10))
+			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10))
+			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10))
+
+			fmt.Println("Chain made, can be found here: " +
+				"http://altcoin.host:8090/search?input=" + penId.String() + "&type=chainhead")
+		}
+	}
 
 	mux = http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.Dir(FILES_PATH)))
@@ -91,8 +118,8 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 
 // jsonResponse is used for responding to Post/Get Requests
 type jsonResponse struct {
-	Error   string      `json:"Error"`
-	Content interface{} `json:"Content"`
+	Error   string      `json:"error"`
+	Content interface{} `json:"content"`
 }
 
 func newJsonResponse(err string, content interface{}) *jsonResponse {
@@ -133,6 +160,11 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	switch req {
 	case "on":
 		w.Write(jsonResp(true))
+	case "all-pensions":
+		err := handleAllPensions(w, r)
+		if err != nil {
+			jsonError(err.Error())
+		}
 	default:
 		w.Write(jsonError("Not a valid request"))
 	}
@@ -150,6 +182,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 
 	req := r.FormValue("request")
 	switch req {
+	case "":
 	default:
 		w.Write(jsonError("Not a post valid request"))
 	}

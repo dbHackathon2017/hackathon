@@ -3,10 +3,13 @@ package common
 import (
 	"log"
 	"math/rand"
+	"sort"
 
 	"github.com/dbHackathon2017/hackathon/common/primitives"
 	//"transaction"
 )
+
+const layout = "Jan 2, 2006"
 
 // Pension structs contain all information about a pension relative to
 // factom. This means it does not contain personal information (name/address/etc)
@@ -35,6 +38,15 @@ func RandomPension() *Pension {
 	p.AuthKey = *primitives.RandomPublicKey()
 	p.FixPids()
 	return p
+}
+
+func (p *Pension) LastInteraction() string {
+	if len(p.Transactions) >= 1 {
+		sort.Sort(TransList(p.Transactions))
+		return p.Transactions[0].Timestamp.Format(layout)
+	}
+	return "NA"
+
 }
 
 func (p *Pension) FixPids() {

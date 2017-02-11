@@ -124,6 +124,8 @@ type File struct {
 	DocHash   Hash
 	Timestamp time.Time
 	DocType   uint32
+	Source    string
+	Location  string
 }
 
 func NewFile(filename string) (*File, error) {
@@ -145,6 +147,11 @@ func RandomFile() *File {
 	f.DocHash = *RandomHash()
 	f.Timestamp = time.Now()
 	f.DocType = constants.DOC_TXT
+
+	str = random.RandStringOfSize(f.MaxLength())
+	f.Source = str
+	str = random.RandStringOfSize(f.MaxLength())
+	f.Location = str
 
 	return f
 
@@ -192,6 +199,14 @@ func (a *File) IsSameAs(b *File) bool {
 		return false
 	}
 
+	if a.Source != b.Source {
+		return false
+	}
+
+	if a.Location != b.Location {
+		return false
+	}
+
 	return true
 }
 
@@ -217,7 +232,18 @@ func (f *File) MarshalBinary() ([]byte, error) {
 	buf.Write(data)
 
 	data = Uint32ToBytes(f.DocType)
+	buf.Write(data)
 
+	data, err = MarshalStringToBytes(f.Source, f.MaxLength())
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	data, err = MarshalStringToBytes(f.Location, f.MaxLength())
+	if err != nil {
+		return nil, err
+	}
 	buf.Write(data)
 
 	return buf.Next(buf.Len()), nil
@@ -265,6 +291,18 @@ func (f *File) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
 	}
 	f.DocType = val
 	newData = newData[4:]
+
+	str, newData, err = UnmarshalStringFromBytesData(newData, f.MaxLength())
+	if err != nil {
+		return data, err
+	}
+	f.Source = str
+
+	str, newData, err = UnmarshalStringFromBytesData(newData, f.MaxLength())
+	if err != nil {
+		return data, err
+	}
+	f.Location = str
 
 	return
 }

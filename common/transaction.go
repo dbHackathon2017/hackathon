@@ -88,3 +88,15 @@ func (a *Transaction) IsSameAs(b *Transaction) bool {
 
 	return true
 }
+
+type TransList []*Transaction
+
+func (s TransList) Len() int {
+	return len(s)
+}
+func (s TransList) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s TransList) Less(i, j int) bool {
+	return s[i].Timestamp.Before(s[j].Timestamp)
+}
