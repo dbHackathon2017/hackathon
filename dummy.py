@@ -46,10 +46,10 @@ def gendummyDict():
             "lastname":genRandomName(1),
             "address":genRandomAdress(),
             "phone":genRandomPhone(),
-            "Bsn":genRandomNumberString(9),
+            "ssn":genRandomNumberString(9),
             "acctnum":genRandomNumberString(10),
             "docs": docs}
-    pensionDict = {"request": "pension", "params":params}
+    pensionDict = {"request": "makepension", "params":params}
     return pensionDict
 
 def genDummyData():

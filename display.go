@@ -285,7 +285,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 		}
-	case "make-pension":
+	case "makepension":
 		err := handleMakePension(w, r, data)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
