@@ -21,6 +21,7 @@ type Pension struct {
 	Transactions []*Transaction
 	Company      primitives.PersonName // Company name, use same primitive
 	UniqueHash   primitives.Hash
+	Docs         primitives.FileList
 
 	// The current amount of tokens in the pension.
 	Value   int

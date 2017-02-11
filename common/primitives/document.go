@@ -32,24 +32,6 @@ func RandomFileList(max uint32) *FileList {
 	return fl
 }
 
-func (af *FileList) Empty() bool {
-	if len(af.FileList) == 0 {
-		return true
-	}
-
-	return false
-}
-
-func (af *FileList) AddFile(filename string) error {
-	f, err := NewFile(filename)
-	if err != nil {
-		return err
-	}
-
-	af.FileList = append(af.FileList, *f)
-	return nil
-}
-
 func (fl *FileList) GetFiles() []File {
 	return fl.FileList
 }

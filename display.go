@@ -243,7 +243,7 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	case "on":
 		w.Write(jsonResp(true))
 	default:
-		w.Write(jsonError("Not a valid request"))
+		w.Write(jsonError("Not a valid GET request"))
 	}
 }
 
@@ -294,7 +294,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			w.Write(jsonError(err.Error()))
 		}
 	default:
-		w.Write(jsonError("Not a post valid request"))
+		w.Write(jsonError("Not a valid POST request"))
 	}
 
 }

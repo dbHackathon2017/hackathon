@@ -187,6 +187,46 @@ func RandomFakeCompay() *FakeCompany {
 	return fc
 }
 
+func (fc *FakeCompany) CreatePension(fn, ln, addr, pn, ssn, acct string, docs primitives.FileList) (primitives.Hash, error) {
+	pm := new(PensionAndMetadata)
+	pm.SigningKey = fc.SigningKey
+
+	p := new(common.Pension)
+
+	p.AuthKey = fc.SigningKey.Public
+	p.Value = 0
+	p.Company = fc.CompanyName
+	p.UniqueHash = *primitives.RandomHash()
+
+	ec := write.GetECAddress()
+	_, err := write.SubmitPensionToFactom(p, ec)
+	if err != nil {
+		return *primitives.NewZeroHash(), err
+	}
+
+	pm.FirstName = fn
+	pm.LastName = ln
+	pm.Address = addr
+	pm.PhoneNumber = pn
+	pm.CompanyName = fc.CompanyName.String()
+	pm.SSN = ssn
+	pm.AccountNumber = acct
+
+	pm.PensionID = p.PensionID
+	fc.Pensions = append(fc.Pensions, pm)
+
+	return p.PensionID, nil
+}
+
+func (fc *FakeCompany) GetPensionByID(id string) *PensionAndMetadata {
+	for _, p := range fc.Pensions {
+		if p.PensionID.String() == id {
+			return p
+		}
+	}
+	return nil
+}
+
 func (fc *FakeCompany) CreateRandomPension() (primitives.Hash, error) {
 	pm := new(PensionAndMetadata)
 	pm.SigningKey = fc.SigningKey

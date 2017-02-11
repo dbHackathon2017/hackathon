@@ -16,6 +16,7 @@ var _ = constants.FAC_LIQUID_SEND
 
 func GetTransactionFromTxID(id primitives.Hash) (*common.Transaction, error) {
 	ent, err := factom.GetEntry(id.String())
+	fmt.Println(ent, err)
 	if err != nil {
 		return nil, err
 	}
@@ -243,6 +244,11 @@ func buildPensionFromFactomEntry(e *factom.Entry) *common.Pension {
 	}
 
 	p.PensionID = *pid
+
+	err = p.Docs.UnmarshalBinary(e.Content)
+	if err != nil {
+		return nil
+	}
 
 	return p
 }
