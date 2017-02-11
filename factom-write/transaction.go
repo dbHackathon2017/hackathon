@@ -30,7 +30,11 @@ var _ = constants.CHAIN_PREFIX
 //		Content
 //			DocumentData
 func SubmitValueChangeTransactionToPension(trans *common.Transaction, ec *factom.ECAddress, sigKey primitives.PrivateKey) (*primitives.Hash, error) {
-	trans.UserType = constants.USER_TRANS_VAL_CHANGE
+	if trans.ValueChange == 0 {
+		trans.UserType = constants.USER_TRANS_DOC_CHANGE
+	} else {
+		trans.UserType = constants.USER_TRANS_VAL_CHANGE
+	}
 	trans.FactomType = constants.FAC_TRANS_VAL_CHANGE
 	return submitTransactionToFactom("Transaction Value Change", trans, ec, sigKey)
 

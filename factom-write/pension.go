@@ -34,6 +34,11 @@ func SubmitPensionToFactom(pen *common.Pension, ec *factom.ECAddress) (*primitiv
 	e.ExtIDs = append(e.ExtIDs, pen.UniqueHash.Bytes())  // 3
 	nonce := FindValidNonce(e)
 	e.ExtIDs = append(e.ExtIDs, nonce) // 4
+	data, err := pen.Docs.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	e.Content = data
 
 	c := factom.NewChain(e)
 

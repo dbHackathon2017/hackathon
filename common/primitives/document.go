@@ -32,24 +32,6 @@ func RandomFileList(max uint32) *FileList {
 	return fl
 }
 
-func (af *FileList) Empty() bool {
-	if len(af.FileList) == 0 {
-		return true
-	}
-
-	return false
-}
-
-func (af *FileList) AddFile(filename string) error {
-	f, err := NewFile(filename)
-	if err != nil {
-		return err
-	}
-
-	af.FileList = append(af.FileList, *f)
-	return nil
-}
-
 func (fl *FileList) GetFiles() []File {
 	return fl.FileList
 }
@@ -135,7 +117,7 @@ func NewFile(filename string) (*File, error) {
 		return nil, err
 	}
 
-	f.Timestamp = time.Now()
+	f.Timestamp = random.RandomTimestamp() // time.Now()
 
 	return f, nil
 }
@@ -145,7 +127,7 @@ func RandomFile() *File {
 	str := random.RandStringOfSize(f.MaxLength())
 	f.SetFileName(str)
 	f.DocHash = *RandomHash()
-	f.Timestamp = time.Now()
+	f.Timestamp = random.RandomTimestamp() // time.Now()
 	f.DocType = constants.DOC_TXT
 
 	str = random.RandStringOfSize(f.MaxLength())

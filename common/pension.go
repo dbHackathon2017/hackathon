@@ -21,10 +21,12 @@ type Pension struct {
 	Transactions []*Transaction
 	Company      primitives.PersonName // Company name, use same primitive
 	UniqueHash   primitives.Hash
+	Docs         primitives.FileList
 
 	// The current amount of tokens in the pension.
 	Value   int
 	AuthKey primitives.PublicKey
+	Active  bool
 }
 
 func RandomPension() *Pension {
@@ -39,6 +41,7 @@ func RandomPension() *Pension {
 	p.AuthKey = *primitives.RandomPublicKey()
 	p.UniqueHash = *primitives.RandomHash()
 	p.FixPids()
+	p.Active = true
 	return p
 }
 

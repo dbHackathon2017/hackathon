@@ -9,6 +9,7 @@ import (
 
 func init() {
 	rand.Seed(time.Now().Unix())
+	moment = time.Now().Add(-12000 * time.Hour)
 }
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -20,6 +21,29 @@ func RandStringOfSize(n int) string {
 	}
 	return string(b)
 }
+
+var moment time.Time
+
+func RandomTimestamp() time.Time {
+	moment = moment.Add(25 * time.Hour)
+	/*t := time.Now()
+	s := RandomInt64Between(0, 10000)
+	h := RandomInt64Between(0, 100)
+	t.Add(-1 * (time.Duration(s) * time.Second))
+	t.Add(-1 * (time.Duration(h) * time.Hour))*/
+	return moment
+}
+
+/*
+func RandomTimestamp() time.Time {
+	t := time.Now()
+	s := RandomInt64Between(0, 10000)
+	h := RandomInt64Between(0, 100)
+	t.Add(-1 * (time.Duration(s) * time.Second))
+	t.Add(-1 * (time.Duration(h) * time.Hour))
+	return t
+}
+*/
 
 // Max size 1000
 func RandString() string {

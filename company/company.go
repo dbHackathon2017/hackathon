@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"sync"
-	"time"
 
 	"github.com/dbHackathon2017/hackathon/common"
 	"github.com/dbHackathon2017/hackathon/common/primitives"
@@ -187,7 +186,47 @@ func RandomFakeCompay() *FakeCompany {
 	return fc
 }
 
-func (fc *FakeCompany) CreatePension() (primitives.Hash, error) {
+func (fc *FakeCompany) CreatePension(fn, ln, addr, pn, ssn, acct string, docs primitives.FileList) (primitives.Hash, error) {
+	pm := new(PensionAndMetadata)
+	pm.SigningKey = fc.SigningKey
+
+	p := new(common.Pension)
+
+	p.AuthKey = fc.SigningKey.Public
+	p.Value = 0
+	p.Company = fc.CompanyName
+	p.UniqueHash = *primitives.RandomHash()
+
+	ec := write.GetECAddress()
+	_, err := write.SubmitPensionToFactom(p, ec)
+	if err != nil {
+		return *primitives.NewZeroHash(), err
+	}
+
+	pm.FirstName = fn
+	pm.LastName = ln
+	pm.Address = addr
+	pm.PhoneNumber = pn
+	pm.CompanyName = fc.CompanyName.String()
+	pm.SSN = ssn
+	pm.AccountNumber = acct
+
+	pm.PensionID = p.PensionID
+	fc.Pensions = append(fc.Pensions, pm)
+
+	return p.PensionID, nil
+}
+
+func (fc *FakeCompany) GetPensionByID(id string) *PensionAndMetadata {
+	for _, p := range fc.Pensions {
+		if p.PensionID.String() == id {
+			return p
+		}
+	}
+	return nil
+}
+
+func (fc *FakeCompany) CreateRandomPension() (primitives.Hash, error) {
 	pm := new(PensionAndMetadata)
 	pm.SigningKey = fc.SigningKey
 
@@ -219,11 +258,15 @@ func (fc *FakeCompany) CreatePension() (primitives.Hash, error) {
 }
 
 // AddValue returns transaction hash and error
-func (p *PensionAndMetadata) AddValue(valueChange int, person primitives.PersonName, docs primitives.FileList) (*primitives.Hash, error) {
+func (p *PensionAndMetadata) AddValue(valueChange int, person primitives.PersonName, docs primitives.FileList, randTime bool) (*primitives.Hash, error) {
 	trans := new(common.Transaction)
 	trans.PensionID = p.PensionID
 	trans.ToPensionID = p.PensionID
-	trans.Timestamp = time.Now()
+	//if randTime {
+	trans.Timestamp = random.RandomTimestamp()
+	//} else {
+	//	trans.Timestamp = time.Now()
+	//}
 	trans.Person = person
 	trans.Docs = docs
 	trans.ValueChange = valueChange
@@ -244,7 +287,7 @@ func (a *PensionAndMetadata) MoveChainTo(b *PensionAndMetadata, person primitive
 	send := new(common.Transaction)
 	send.PensionID = a.PensionID
 	send.ToPensionID = a.PensionID
-	send.Timestamp = time.Now()
+	send.Timestamp = random.RandomTimestamp()
 	send.Person = person
 	send.Docs = docs
 	send.ValueChange = aPen.Value
@@ -257,7 +300,7 @@ func (a *PensionAndMetadata) MoveChainTo(b *PensionAndMetadata, person primitive
 	req := new(common.Transaction)
 	req.PensionID = b.PensionID
 	req.ToPensionID = b.PensionID
-	req.Timestamp = time.Now()
+	req.Timestamp = send.Timestamp
 	req.Person = person
 	req.Docs = docs
 	req.ValueChange = aPen.Value

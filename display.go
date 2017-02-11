@@ -30,6 +30,8 @@ var (
 
 	mux           *http.ServeMux
 	TemplateMutex sync.Mutex
+
+	templateDelims = []string{"{--{", "}--}"}
 )
 
 func GetFromPensionCache(penid string) *common.Pension {
@@ -77,8 +79,8 @@ func InitTemplate() {
 	TemplateMutex.Lock()
 	// Put function into templates
 	templates = template.New("main")
-	//templates = template.Must(templates.ParseGlob(FILES_PATH + "/html/*"))
-
+	// templates = template.Must(templates.ParseGlob(FILES_PATH + "/html/*"))
+	templates = templates.Delims(templateDelims[0], templateDelims[1])
 	TemplateMutex.Unlock()
 
 	PensionCache = make(map[string]common.Pension)
@@ -104,16 +106,16 @@ func ServeFrontEnd(port int) {
 
 	if MAKE_TRANS {
 		for i := 0; i < 3; i++ {
-			penId, err := MainCompany.CreatePension()
+			penId, err := MainCompany.CreateRandomPension()
 			if err != nil {
 				panic(err)
 			}
 
-			MainCompany.Pensions[i].AddValue(100, "Steven WOOT!", *primitives.RandomFileList(10))
-			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10))
-			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10))
-			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10))
-			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10))
+			MainCompany.Pensions[i].AddValue(100, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
 
 			fmt.Println("Chain made, can be found here: " +
 				"http://altcoin.host:8090/search?input=" + penId.String() + "&type=chainhead")
@@ -181,7 +183,7 @@ func static(h http.HandlerFunc) http.HandlerFunc {
 // pageHandler redirects all page requests to proper handlers
 func pageHandler(w http.ResponseWriter, r *http.Request) {
 	TemplateMutex.Lock()
-	templates.ParseGlob(FILES_PATH + "/html/*.html")
+	templates.Delims(templateDelims[0], templateDelims[1]).ParseGlob(FILES_PATH + "/html/*.html")
 	TemplateMutex.Unlock()
 	request := strings.Split(r.RequestURI, "?")
 	var err error
@@ -243,7 +245,7 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	case "on":
 		w.Write(jsonResp(true))
 	default:
-		w.Write(jsonError("Not a valid request"))
+		w.Write(jsonError("Not a valid GET request"))
 	}
 }
 
@@ -288,8 +290,18 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 		}
+	case "transaction":
+		err := handleTransaction(w, r, data)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		}
+	case "company-stats":
+		err := handleCompanyStats(w, r, data)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		}
 	default:
-		w.Write(jsonError("Not a post valid request"))
+		w.Write(jsonError("Not a valid POST request"))
 	}
 
 }

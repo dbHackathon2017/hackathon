@@ -41,5 +41,5 @@ func TestSubmitPension(t *testing.T) {
 		t.Error(err)
 	}
 
-	fmt.Println(c.String() + "\n" + ehash.String())
+	// fmt.Println(c.String() + "\n" + ehash.String())
 }

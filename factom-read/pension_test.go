@@ -48,7 +48,7 @@ func TestReadPension(t *testing.T) {
 
 	//p.Transactions = append(p.Transactions, *trans)
 
-	fmt.Println(c.String() + "\n")
+	// fmt.Println(c.String() + "\n")
 	//p.Value += trans.ValueChange
 
 	time.Sleep(3 * time.Second)
