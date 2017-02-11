@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/dbHackathon2017/hackathon/common"
 	"github.com/dbHackathon2017/hackathon/common/primitives"
 	"github.com/dbHackathon2017/hackathon/company"
 	"github.com/dbHackathon2017/hackathon/factom-read"
@@ -25,19 +26,33 @@ type ShortPensions struct {
 func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
 	pens := MainCompany.Pensions
 	sPens := make([]ShortPensions, len(pens))
+	fmt.Printf("Handling all pensions... %d to do\n", len(pens))
 	for i, sp := range sPens {
 		sp.Acct = pens[i].AccountNumber
 		sp.Firstname = pens[i].FirstName
 		sp.Lastname = pens[i].LastName
 		sp.PenID = pens[i].PensionID.String()
 
-		fpen, err := read.GetPensionFromFactom(pens[i].PensionID)
-		if err == nil {
+		fmt.Printf("- #%d -", i)
+
+		fpen := new(common.Pension)
+		if pp := GetFromPensionCache(pens[i].PensionID.String()); pp != nil {
+			fpen = pp
+		} else {
+			fpen, _ = read.GetPensionFromFactom(pens[i].PensionID)
+			if fpen != nil {
+				AddToPensionCache(fpen.PensionID.String(), *fpen)
+			}
+		}
+		if fpen != nil {
 			sp.Lastint = fpen.LastInteraction()
 		} else {
 			sp.Lastint = "Unknown"
 		}
+
+		sPens[i] = sp
 	}
+	fmt.Println("\nDone All-pensions")
 
 	container := new(ShortPensionsHolder)
 	container.Holder = sPens

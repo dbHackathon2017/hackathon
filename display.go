@@ -9,11 +9,14 @@ import (
 	"strings"
 	"sync"
 	"text/template"
+	"time"
 
 	"github.com/FactomProject/factom"
+	"github.com/dbHackathon2017/hackathon/common"
 	"github.com/dbHackathon2017/hackathon/common/constants"
 	"github.com/dbHackathon2017/hackathon/common/primitives"
 	"github.com/dbHackathon2017/hackathon/company"
+	"github.com/dbHackathon2017/hackathon/factom-read"
 )
 
 var (
@@ -22,9 +25,40 @@ var (
 
 	MainCompany *company.FakeCompany
 
+	cacheLock    sync.RWMutex
+	PensionCache map[string]common.Pension
+
 	mux           *http.ServeMux
 	TemplateMutex sync.Mutex
 )
+
+func GetFromPensionCache(penid string) *common.Pension {
+	cacheLock.RLock()
+	defer cacheLock.RUnlock()
+	if pp, ok := PensionCache[penid]; ok {
+		p := new(common.Pension)
+		*p = pp
+		return p
+	}
+	return nil
+}
+
+// loadCache loads pensions into the cache
+func loadCache(time.Time) {
+	for _, p := range MainCompany.Pensions {
+		fpen, err := read.GetPensionFromFactom(p.PensionID)
+		if err != nil {
+			continue
+		}
+		AddToPensionCache(fpen.PensionID.String(), *fpen)
+	}
+}
+
+func AddToPensionCache(penid string, pen common.Pension) {
+	cacheLock.Lock()
+	PensionCache[penid] = pen
+	cacheLock.Unlock()
+}
 
 func InitTemplate() {
 	TemplateMutex.Lock()
@@ -33,6 +67,8 @@ func InitTemplate() {
 	//templates = template.Must(templates.ParseGlob(FILES_PATH + "/html/*"))
 
 	TemplateMutex.Unlock()
+
+	PensionCache = make(map[string]common.Pension)
 }
 
 func ServeFrontEnd(port int) {
@@ -59,6 +95,8 @@ func ServeFrontEnd(port int) {
 		}
 	}
 
+	go doEvery(10*time.Second, loadCache)
+
 	mux = http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.Dir(FILES_PATH)))
 
@@ -70,6 +108,14 @@ func ServeFrontEnd(port int) {
 
 	fmt.Println("Starting GUI on http://" + portStr + "/")
 	http.ListenAndServe(portStr, nil)
+}
+
+// doEvery
+// For go routines. Calls function once each duration.
+func doEvery(d time.Duration, f func(time.Time)) {
+	for x := range time.Tick(d) {
+		f(x)
+	}
 }
 
 // mkArray makes an array inside a template
@@ -168,8 +214,8 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 }
 
 type POSTRequest struct {
-	Request string      `json:"request"`
-	Params  interface{} `json:"params,omitempty"`
+	Request string          `json:"request"`
+	Params  json.RawMessage `json:"params,omitempty"`
 }
 
 func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {

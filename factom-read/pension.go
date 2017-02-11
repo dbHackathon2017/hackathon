@@ -214,6 +214,13 @@ func buildPensionFromFactomEntry(e *factom.Entry) *common.Pension {
 	}
 	p.AuthKey = *ak
 
+	uh, err := primitives.BytesToHash(e.ExtIDs[3])
+	if err != nil {
+		log.Println("Pub key fails")
+		return nil
+	}
+	p.UniqueHash = *uh
+
 	pid, err := primitives.HexToHash(e.ChainID)
 	if err != nil {
 		log.Println("Pid fails")

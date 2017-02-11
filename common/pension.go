@@ -20,6 +20,7 @@ type Pension struct {
 	PensionID    primitives.Hash
 	Transactions []*Transaction
 	Company      primitives.PersonName // Company name, use same primitive
+	UniqueHash   primitives.Hash
 
 	// The current amount of tokens in the pension.
 	Value   int
@@ -36,6 +37,7 @@ func RandomPension() *Pension {
 	p.Company = *primitives.RandomName()
 	p.Value = 0
 	p.AuthKey = *primitives.RandomPublicKey()
+	p.UniqueHash = *primitives.RandomHash()
 	p.FixPids()
 	return p
 }
@@ -83,6 +85,10 @@ func (a *Pension) IsSameAs(b *Pension) bool {
 
 	if !a.AuthKey.IsSameAs(&b.AuthKey) {
 		log.Printf("Not Same: Found %s, expect %s\n", a.AuthKey.String(), b.AuthKey.String())
+		return false
+	}
+
+	if !a.UniqueHash.IsSameAs(&b.UniqueHash) {
 		return false
 	}
 	return true

@@ -25,8 +25,9 @@ See factom-write pension_test.go for example
 |---|---|
 |ExtID (0)|"Pension Chain"|
 |ExtID (1)|Pension Company|
-|ExtID (2)| Authority PubKey|
-|ExtID (3)| nonce |
+|ExtID (2)|Authority PubKey|
+|ExtID (3)|Hash|
+|ExtID (4)| nonce |
 |Content|Document data
 
 ## Transaction

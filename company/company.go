@@ -5,6 +5,7 @@ import (
 
 	"github.com/dbHackathon2017/hackathon/common"
 	"github.com/dbHackathon2017/hackathon/common/primitives"
+	"github.com/dbHackathon2017/hackathon/common/primitives/random"
 	"github.com/dbHackathon2017/hackathon/factom-read"
 	"github.com/dbHackathon2017/hackathon/factom-write"
 )
@@ -49,15 +50,28 @@ func (fc *FakeCompany) CreatePension() (primitives.Hash, error) {
 	pm.SigningKey = fc.SigningKey
 
 	p := new(common.Pension)
+
 	p.AuthKey = fc.SigningKey.Public
 	p.Value = 0
 	p.Company = fc.CompanyName
+	p.UniqueHash = *primitives.RandomHash()
 
 	ec := write.GetECAddress()
 	_, err := write.SubmitPensionToFactom(p, ec)
 	if err != nil {
 		return *primitives.NewZeroHash(), err
 	}
+
+	pm.FirstName = random.RandStringOfSize(20)
+	pm.LastName = random.RandStringOfSize(20)
+	pm.Address = random.RandStringOfSize(20)
+	pm.PhoneNumber = random.RandStringOfSize(14)
+	pm.CompanyName = fc.CompanyName.String()
+	pm.SSN = random.RandStringOfSize(8)
+	pm.AccountNumber = random.RandStringOfSize(8)
+
+	pm.PensionID = p.PensionID
+	fc.Pensions = append(fc.Pensions, pm)
 
 	pm.PensionID = p.PensionID
 	fc.Pensions = append(fc.Pensions, pm)

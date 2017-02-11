@@ -2,11 +2,11 @@ package write
 
 import (
 	"fmt"
-	"time"
 	"github.com/FactomProject/factom"
 	"github.com/dbHackathon2017/hackathon/common"
 	"github.com/dbHackathon2017/hackathon/common/constants"
 	"github.com/dbHackathon2017/hackathon/common/primitives"
+	"time"
 )
 
 var _ = fmt.Sprintf("")
@@ -30,8 +30,9 @@ func SubmitPensionToFactom(pen *common.Pension, ec *factom.ECAddress) (*primitiv
 	e.ExtIDs = append(e.ExtIDs, []byte("Pension Chain")) // 0
 	e.ExtIDs = append(e.ExtIDs, comp)                    // 1
 	e.ExtIDs = append(e.ExtIDs, pen.AuthKey.Bytes())     // 2
+	e.ExtIDs = append(e.ExtIDs, pen.UniqueHash.Bytes())  // 3
 	nonce := FindValidNonce(e)
-	e.ExtIDs = append(e.ExtIDs, nonce) // 3
+	e.ExtIDs = append(e.ExtIDs, nonce) // 4
 
 	c := factom.NewChain(e)
 
