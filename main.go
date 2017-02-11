@@ -14,7 +14,7 @@ func main() {
 
 	if *jesse {
 		fmt.Println("Using Jesse's path")
-		FILES_PATH = "/home/jesse/Electron/Hackathon/hackathon2/"
+		FILES_PATH = "/home/jesse/Electron/Hackathon/hackathon2"
 	}
 
 	ServeFrontEnd(1337)
