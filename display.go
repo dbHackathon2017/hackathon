@@ -290,6 +290,16 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 		}
+	case "addvalue":
+		err := handleAddValue(w, r, data)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		}
+	case "transfer":
+		err := handleTransfer(w, r, data)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		}
 	default:
 		w.Write(jsonError("Not a valid POST request"))
 	}
