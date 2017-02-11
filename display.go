@@ -160,11 +160,6 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	switch req {
 	case "on":
 		w.Write(jsonResp(true))
-	case "all-pensions":
-		err := handleAllPensions(w, r)
-		if err != nil {
-			jsonError(err.Error())
-		}
 	default:
 		w.Write(jsonError("Not a valid request"))
 	}
@@ -182,7 +177,14 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 
 	req := r.FormValue("request")
 	switch req {
-	case "":
+	case "on":
+		w.Write(jsonResp(true))
+	case "all-pensions":
+		err := handleAllPensions(w, r)
+		if err != nil {
+			jsonError(err.Error())
+		}
+	case "pension":
 	default:
 		w.Write(jsonError("Not a post valid request"))
 	}
