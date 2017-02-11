@@ -4,6 +4,7 @@ import json
 import string
 import datetime
 import csv
+import os
 
 names_file = "names.txt"
 names = open(names_file).read().splitlines()
@@ -36,49 +37,27 @@ def genRandomAdress():
 
 
 def gendummyDict():
-    dummyList = []
-    for i in range(50):
-        docs = {"path": "check.pdf",
-                "hash":genRandomHash(),
-                "timestamp": str(datetime.datetime.utcnow()),
-                "source":"NestEgg" ,
-                "location": "NestEgg"}
-        params = {'firstname': genRandomName(0),
+    docs = {"path": "check.pdf",
+            "hash":genRandomHash(),
+            "timestamp": str(datetime.datetime.utcnow()),
+            "source":"NestEgg" ,
+            "location": "NestEgg"}
+    params = {'firstname': genRandomName(0),
             "lastname":genRandomName(1),
             "address":genRandomAdress(),
             "phone":genRandomPhone(),
-            "ssn":genRandomNumberString(9),
+            "Bsn":genRandomNumberString(9),
             "acctnum":genRandomNumberString(10),
             "docs": docs}
-        pensionDict = {"request": "pension", "params":params}
-        dummyList.append(pensionDict)
-    dummyDict = {"pensions": dummyList}
-    return dummyDict
-f = open('dummy.json', 'w')
-json.dump(gendummyDict(), f)
-print json.dumps(gendummyDict(), sort_keys=True, indent=4, separators=(',', ': '))
+    pensionDict = {"request": "pension", "params":params}
+    return pensionDict
 
-#print genRandomName(0),genRandomName(1)
-#print gendummyDict()
+def genDummyData():
+    if not os.path.exists("dummy"):
+        os.system("sudo mkdir dummy")
+    for i in range(50):
+        f = open('dummy/dummy'+str(i)+'.json', 'w')
+        json.dump(gendummyDict(), f)
+    return
 
-
-"""{
-   "request":"pension",
-   "params":{
-      "firstname":"FIRST_NAME",
-      "lastname":"LAST_NAME",
-      "address":"ADDRESS",
-      "phone":"PHONE_NUM",
-      "ssn":"SSN",
-      "acctnum":"ACCT_NUM",
-      "docs":[
-         {
-            "path":"FILE_PATH",
-            "hash":"FILE_HASH",
-            "timestamp":"TIME_STAMP", // formatted string
-            "source":"WHO_MADE",
-            "location":"WHERE"
-         }
-      ]
-   }
-}"""
+genDummyData()
