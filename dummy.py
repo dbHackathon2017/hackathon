@@ -37,11 +37,11 @@ def genRandomAdress():
 
 
 def gendummyDict():
-    docs = {"path": "check.pdf",
+    docs = [{"path": "check.pdf",
             "hash":genRandomHash(),
             "timestamp": str(datetime.datetime.utcnow()),
             "source":"NestEgg" ,
-            "location": "NestEgg"}
+            "location": "NestEgg"}]
     params = {'firstname': genRandomName(0),
             "lastname":genRandomName(1),
             "address":genRandomAdress(),
