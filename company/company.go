@@ -73,9 +73,6 @@ func (fc *FakeCompany) CreatePension() (primitives.Hash, error) {
 	pm.PensionID = p.PensionID
 	fc.Pensions = append(fc.Pensions, pm)
 
-	pm.PensionID = p.PensionID
-	fc.Pensions = append(fc.Pensions, pm)
-
 	return p.PensionID, nil
 }
 
