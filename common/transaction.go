@@ -76,7 +76,10 @@ func (t *Transaction) GetFactomTypeString() string {
 	if t.UserType == constants.FAC_LIQUID_SEND {
 		return "Chain Liquidation"
 	} else if t.UserType == constants.FAC_TRANS_VAL_CHANGE {
-		return "ValueChange"
+		if t.ValueChange < 0 {
+			return "Withdraw"
+		}
+		return "Deposit"
 	} else if t.UserType == constants.FAC_LIQUID_REQUEST {
 		return "Retquest Merge In"
 	} else if t.UserType == constants.FAC_LIQUID_CONFIRM {

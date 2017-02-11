@@ -99,6 +99,7 @@ func ServeFrontEnd(port int) {
 	MainCompany = company.RandomFakeCompay()
 	if USE_DB {
 		MainCompany.LoadFromDB()
+		go loadCache(time.Now())
 	}
 
 	if MAKE_TRANS {

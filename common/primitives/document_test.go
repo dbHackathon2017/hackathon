@@ -12,7 +12,7 @@ var _ = fmt.Sprintf("")
 
 func TestSingleFile(t *testing.T) {
 	for i := 0; i < 1000; i++ {
-		l := RandomFile()
+		fmt.Print(l)
 		data, err := l.MarshalBinary()
 		if err != nil {
 			t.Error(err)
@@ -72,19 +72,6 @@ func TestDiffFileList(t *testing.T) {
 	}
 	if same > 15 {
 		t.Error("More than 15 are the same, it is totally random, so it is likely the IsSameAs is broken.")
-	}
-
-}
-
-func TestEmptyFiles(t *testing.T) {
-	af := new(FileList)
-	if !af.Empty() {
-		t.Error("Should be empty")
-	}
-
-	f := new(File)
-	if !f.Empty() {
-		t.Error("Should be empty")
 	}
 
 }

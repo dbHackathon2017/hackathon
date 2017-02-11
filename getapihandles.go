@@ -196,6 +196,7 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 			docStruct[i] = *singDoc
 		}
 
+		sing.Docs = docStruct
 		transStruct[i] = *sing
 	}
 
