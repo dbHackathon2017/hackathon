@@ -201,7 +201,7 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 			singDoc := new(Document)
 			singDoc.Source = d.Source
 			singDoc.Location = d.Location
-			singDoc.Path = d.Name
+			singDoc.Path = d.GetFullPath()
 			singDoc.Timestamp = d.GetTimeStampFormatted()
 			singDoc.Hash = d.DocHash.String()
 
@@ -283,7 +283,7 @@ func handleTransaction(w http.ResponseWriter, r *http.Request, data []byte) erro
 				retDoc.Location = d.Location
 				retDoc.Source = d.Source
 				retDoc.Timestamp = d.GetTimeStampFormatted()
-				retDoc.Path = d.Name
+				retDoc.Path = d.GetFullPath()
 				w.Write(jsonResp(retDoc))
 				return nil
 			}
@@ -307,7 +307,7 @@ func handleTransaction(w http.ResponseWriter, r *http.Request, data []byte) erro
 		singDoc := new(Document)
 		singDoc.Source = d.Source
 		singDoc.Location = d.Location
-		singDoc.Path = d.Name
+		singDoc.Path = d.GetFullPath()
 		singDoc.Timestamp = d.GetTimeStampFormatted()
 		singDoc.Hash = d.DocHash.String()
 

@@ -95,6 +95,8 @@ func submitTransactionToFactom(message string, trans *common.Transaction, ec *fa
 	e.ExtIDs = append(e.ExtIDs, sigKey.Public.Bytes()) // 7
 	e.ExtIDs = append(e.ExtIDs, sig)                   // 8
 
+	trans.Docs.FixFiles()
+
 	docs, err := trans.Docs.MarshalBinary()
 	if err != nil {
 		return nil, err

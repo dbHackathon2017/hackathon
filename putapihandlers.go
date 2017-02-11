@@ -46,6 +46,7 @@ func handleMakePension(w http.ResponseWriter, r *http.Request, data []byte) erro
 
 	list := docsToFileList(pr.Params.Docs)
 	docs = list
+	docs.FixFiles()
 
 	penID, err := MainCompany.CreatePension(pr.Params.Firstname,
 		pr.Params.Lastname,

@@ -32,6 +32,15 @@ func RandomFileList(max uint32) *FileList {
 	return fl
 }
 
+func (fl *FileList) FixFiles() {
+	if len(fl.FileList) == 0 {
+		return
+	}
+	for i := range fl.FileList {
+		fl.FileList[i].FixFile()
+	}
+}
+
 func (fl *FileList) GetFiles() []File {
 	return fl.FileList
 }
@@ -145,7 +154,7 @@ func RandomFile() *File {
 const layout = "Jan 2, 2006"
 
 func (f *File) GetFullPath() string {
-	return f.Name
+	return "files/" + f.Name
 }
 
 func (f *File) GetTimeStampFormatted() string {
@@ -159,6 +168,16 @@ func (f *File) SetFileName(filename string) error {
 
 	f.Name = filename
 	return nil
+}
+
+func (f *File) FixFile() {
+	if f == nil {
+		return
+	}
+	i := random.RandomIntBetween(0, len(constants.FILE_NAMES))
+	f.Name = constants.FILE_NAMES[i]
+	hash, _ := HexToHash(constants.FILE_HASHES[i])
+	f.DocHash = *hash
 }
 
 func (f *File) String() string {
