@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	//"io/ioutil"
 	"net/http"
 
 	"github.com/dbHackathon2017/hackathon/common"
@@ -108,16 +110,40 @@ type Document struct {
 	Location  string `json:"location"`
 }
 
-func handlePension(w http.ResponseWriter, r *http.Request) error {
-	penIDStr := r.FormValue("content")
+func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
+	// penIDStr := r.FormValue("content")
+	type POSTPenRequest struct {
+		Request string `json:"request"`
+		Params  string `json:"params,omitempty"`
+	}
+
+	pr := new(POSTPenRequest)
+
+	/*data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Printf("Exit 1")
+		return err
+	}*/
+
+	err := json.Unmarshal(data, pr)
+	if err != nil {
+		return err
+	}
+
+	penIDStr := pr.Params
+	fmt.Println(penIDStr)
+
 	penID, err := primitives.HexToHash(penIDStr)
 	if err != nil {
 		return err
 	}
 
-	factomPen, err := read.GetPensionFromFactom(*penID)
-	if err != nil {
-		return err
+	factomPen := GetFromPensionCache(penID.String())
+	if factomPen == nil {
+		factomPen, err = read.GetPensionFromFactom(*penID)
+		if err != nil {
+			return err
+		}
 	}
 
 	metaPen := new(company.PensionAndMetadata)
@@ -142,6 +168,7 @@ func handlePension(w http.ResponseWriter, r *http.Request) error {
 	header.Addr = metaPen.Address
 	header.Phone = metaPen.PhoneNumber
 	header.Ssn = metaPen.SSN
+	holder.Header = *header
 
 	penStruct := new(LongPension)
 	penStruct.Penid = penID.String()

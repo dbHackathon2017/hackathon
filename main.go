@@ -11,7 +11,7 @@ var (
 
 func main() {
 	var (
-		jesse     = flag.Bool("j", true, "Only use if you are jesse")
+		jesse     = flag.Bool("j", false, "Only use if you are jesse")
 		makeTrans = flag.Bool("t", false, "Turn this off if you don't want factom transactions made at bootup")
 	)
 

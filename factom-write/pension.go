@@ -6,6 +6,7 @@ import (
 	"github.com/dbHackathon2017/hackathon/common"
 	"github.com/dbHackathon2017/hackathon/common/constants"
 	"github.com/dbHackathon2017/hackathon/common/primitives"
+	"log"
 	"time"
 )
 
@@ -38,6 +39,7 @@ func SubmitPensionToFactom(pen *common.Pension, ec *factom.ECAddress) (*primitiv
 
 	_, err = factom.CommitChain(c, ec)
 	if err != nil {
+		log.Println("Error in submit pension to factom: " + err.Error())
 		return nil, err
 	}
 
@@ -51,6 +53,7 @@ func SubmitPensionToFactom(pen *common.Pension, ec *factom.ECAddress) (*primitiv
 
 	chainID, err := primitives.HexToHash(c.FirstEntry.ChainID)
 	if err != nil {
+		log.Println("Error in submit pension to factom: " + err.Error())
 		return nil, err
 	}
 	pen.PensionID = *chainID

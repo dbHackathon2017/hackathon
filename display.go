@@ -33,7 +33,6 @@ var (
 )
 
 func GetFromPensionCache(penid string) *common.Pension {
-	fmt.Println("GET: " + penid)
 	cacheLock.RLock()
 	defer cacheLock.RUnlock()
 	if pp, ok := PensionCache[penid]; ok {
@@ -52,9 +51,10 @@ func loadCache(time.Time) {
 		return
 	}
 	loading = true
-	fmt.Println("Adding to cache")
+	//fmt.Println("Adding to cache")
 	for i, p := range MainCompany.Pensions {
-		fmt.Printf("- #%d -", i)
+		//fmt.Printf("- #%d -", i)
+		var _ = i
 		fpen, err := read.GetPensionFromFactom(p.PensionID)
 		if err != nil {
 			fmt.Println(err)
@@ -66,7 +66,6 @@ func loadCache(time.Time) {
 }
 
 func AddToPensionCache(penid string, pen common.Pension) {
-	fmt.Println("PUT: " + penid)
 	cacheLock.Lock()
 	PensionCache[penid] = pen
 	cacheLock.Unlock()
@@ -110,7 +109,7 @@ func ServeFrontEnd(port int) {
 	}
 
 	go func() {
-		time.Sleep(3 * time.Second)
+		time.Sleep(5 * time.Second)
 		loadCache(time.Now())
 	}()
 	go doEvery(10*time.Second, loadCache)
@@ -268,6 +267,10 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 			jsonError(err.Error())
 		}
 	case "pension":
+		err := handlePension(w, r, data)
+		if err != nil {
+			jsonError(err.Error())
+		}
 	default:
 		w.Write(jsonError("Not a post valid request"))
 	}
