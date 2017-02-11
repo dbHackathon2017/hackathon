@@ -11,7 +11,7 @@ func HandleIndexPage(w http.ResponseWriter, r *http.Request) error {
 	TemplateMutex.Lock()
 	defer TemplateMutex.Unlock()
 
-	templates.ExecuteTemplate(w, "index", nil)
+	templates.Delims(templateDelims[0], templateDelims[1]).ExecuteTemplate(w, "index", nil)
 	return nil
 }
 

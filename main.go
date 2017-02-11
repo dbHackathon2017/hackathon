@@ -18,7 +18,7 @@ func main() {
 		jesse     = flag.Bool("j", false, "Only use if you are jesse")
 		makeTrans = flag.Bool("t", false, "Turn this on if you want factom transactions made at bootup")
 		db        = flag.Bool("db", false, "Turn this on if you want to use db cache")
-		robin 		= flag.Bool("r", false, "Only use if you are robin")
+		robin     = flag.Bool("r", false, "Only use if you are robin")
 	)
 
 	flag.Parse()
@@ -48,6 +48,6 @@ func main() {
 		}
 		os.Exit(1)
 	}()
-
+	fmt.Printf("Path: %s\n", FILES_PATH)
 	ServeFrontEnd(1337)
 }

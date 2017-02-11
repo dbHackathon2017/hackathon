@@ -30,6 +30,8 @@ var (
 
 	mux           *http.ServeMux
 	TemplateMutex sync.Mutex
+
+	templateDelims = []string{"{--{", "}--}"}
 )
 
 func GetFromPensionCache(penid string) *common.Pension {
@@ -77,8 +79,8 @@ func InitTemplate() {
 	TemplateMutex.Lock()
 	// Put function into templates
 	templates = template.New("main")
-	//templates = template.Must(templates.ParseGlob(FILES_PATH + "/html/*"))
-
+	// templates = template.Must(templates.ParseGlob(FILES_PATH + "/html/*"))
+	templates = templates.Delims(templateDelims[0], templateDelims[1])
 	TemplateMutex.Unlock()
 
 	PensionCache = make(map[string]common.Pension)
@@ -181,7 +183,7 @@ func static(h http.HandlerFunc) http.HandlerFunc {
 // pageHandler redirects all page requests to proper handlers
 func pageHandler(w http.ResponseWriter, r *http.Request) {
 	TemplateMutex.Lock()
-	templates.ParseGlob(FILES_PATH + "/html/*.html")
+	templates.Delims(templateDelims[0], templateDelims[1]).ParseGlob(FILES_PATH + "/html/*.html")
 	TemplateMutex.Unlock()
 	request := strings.Split(r.RequestURI, "?")
 	var err error
