@@ -219,11 +219,15 @@ func (fc *FakeCompany) CreatePension() (primitives.Hash, error) {
 }
 
 // AddValue returns transaction hash and error
-func (p *PensionAndMetadata) AddValue(valueChange int, person primitives.PersonName, docs primitives.FileList) (*primitives.Hash, error) {
+func (p *PensionAndMetadata) AddValue(valueChange int, person primitives.PersonName, docs primitives.FileList, randTime bool) (*primitives.Hash, error) {
 	trans := new(common.Transaction)
 	trans.PensionID = p.PensionID
 	trans.ToPensionID = p.PensionID
-	trans.Timestamp = time.Now()
+	if randTime {
+		trans.Timestamp = random.RandomTimestamp()
+	} else {
+		trans.Timestamp = time.Now()
+	}
 	trans.Person = person
 	trans.Docs = docs
 	trans.ValueChange = valueChange

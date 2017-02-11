@@ -21,6 +21,15 @@ func RandStringOfSize(n int) string {
 	return string(b)
 }
 
+func RandomTimestamp() time.Time {
+	t := time.Now()
+	s := RandomInt64Between(0, 10000)
+	h := RandomInt64Between(0, 100)
+	t.Add(-1 * (time.Duration(s) * time.Second))
+	t.Add(-1 * (time.Duration(h) * time.Hour))
+	return t
+}
+
 // Max size 1000
 func RandString() string {
 	return RandStringOfSize(rand.Intn(1000))

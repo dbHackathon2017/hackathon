@@ -109,11 +109,11 @@ func ServeFrontEnd(port int) {
 				panic(err)
 			}
 
-			MainCompany.Pensions[i].AddValue(100, "Steven WOOT!", *primitives.RandomFileList(10))
-			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10))
-			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10))
-			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10))
-			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10))
+			MainCompany.Pensions[i].AddValue(100, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
 
 			fmt.Println("Chain made, can be found here: " +
 				"http://altcoin.host:8090/search?input=" + penId.String() + "&type=chainhead")
