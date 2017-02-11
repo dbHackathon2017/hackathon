@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 )
 
 func main() {
@@ -12,7 +13,8 @@ func main() {
 	flag.Parse()
 
 	if *jesse {
-		FILES_PATH = "/home/jesse/Electron/Hackathon/hackathon2"
+		fmt.Println("Using Jesse's path")
+		FILES_PATH = "/home/jesse/Electron/Hackathon/hackathon2/"
 	}
 
 	ServeFrontEnd(1337)
