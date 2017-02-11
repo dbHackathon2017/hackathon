@@ -117,7 +117,7 @@ func NewFile(filename string) (*File, error) {
 		return nil, err
 	}
 
-	f.Timestamp = time.Now()
+	f.Timestamp = random.RandomTimestamp() // time.Now()
 
 	return f, nil
 }
@@ -127,7 +127,7 @@ func RandomFile() *File {
 	str := random.RandStringOfSize(f.MaxLength())
 	f.SetFileName(str)
 	f.DocHash = *RandomHash()
-	f.Timestamp = time.Now()
+	f.Timestamp = random.RandomTimestamp() // time.Now()
 	f.DocType = constants.DOC_TXT
 
 	str = random.RandStringOfSize(f.MaxLength())

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"sync"
-	"time"
 
 	"github.com/dbHackathon2017/hackathon/common"
 	"github.com/dbHackathon2017/hackathon/common/primitives"
@@ -263,11 +262,11 @@ func (p *PensionAndMetadata) AddValue(valueChange int, person primitives.PersonN
 	trans := new(common.Transaction)
 	trans.PensionID = p.PensionID
 	trans.ToPensionID = p.PensionID
-	if randTime {
-		trans.Timestamp = random.RandomTimestamp()
-	} else {
-		trans.Timestamp = time.Now()
-	}
+	//if randTime {
+	trans.Timestamp = random.RandomTimestamp()
+	//} else {
+	//	trans.Timestamp = time.Now()
+	//}
 	trans.Person = person
 	trans.Docs = docs
 	trans.ValueChange = valueChange
@@ -288,7 +287,7 @@ func (a *PensionAndMetadata) MoveChainTo(b *PensionAndMetadata, person primitive
 	send := new(common.Transaction)
 	send.PensionID = a.PensionID
 	send.ToPensionID = a.PensionID
-	send.Timestamp = time.Now()
+	send.Timestamp = random.RandomTimestamp()
 	send.Person = person
 	send.Docs = docs
 	send.ValueChange = aPen.Value
@@ -301,7 +300,7 @@ func (a *PensionAndMetadata) MoveChainTo(b *PensionAndMetadata, person primitive
 	req := new(common.Transaction)
 	req.PensionID = b.PensionID
 	req.ToPensionID = b.PensionID
-	req.Timestamp = time.Now()
+	req.Timestamp = send.Timestamp
 	req.Person = person
 	req.Docs = docs
 	req.ValueChange = aPen.Value

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	//"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/dbHackathon2017/hackathon/common"
 	"github.com/dbHackathon2017/hackathon/common/primitives"
@@ -45,7 +46,7 @@ func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
 			}*/
 			fpen = nil
 		}
-		fmt.Println(fpen)
+
 		if fpen != nil {
 			sp.Lastint = fpen.LastInteraction()
 			sp.Active = fpen.Active
@@ -58,6 +59,10 @@ func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	container := new(ShortPensionsHolder)
+
+	for i, j := 0, len(sPens)-1; i < j; i, j = i+1, j-1 {
+		sPens[i], sPens[j] = sPens[j], sPens[i]
+	}
 	container.Holder = sPens
 
 	w.Write(jsonResp(container))
@@ -205,6 +210,10 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 		transStruct[i] = *sing
 	}
 
+	for i, j := 0, len(transStruct)-1; i < j; i, j = i+1, j-1 {
+		transStruct[i], transStruct[j] = transStruct[j], transStruct[i]
+	}
+
 	penStruct.Transactions = transStruct
 	holder.Pension = *penStruct
 
@@ -233,15 +242,51 @@ func handleTransaction(w http.ResponseWriter, r *http.Request, data []byte) erro
 	}
 
 	transIDStr := pr.Params
+	docIDStr := pr.Params
+
+	findDoc := strings.Contains(pr.Params, "/")
+	if findDoc {
+		arr := strings.Split(pr.Params, "/")
+		if len(arr) > 1 {
+			transIDStr = arr[0]
+			docIDStr = arr[1]
+		} else if len(arr) == 1 {
+			transIDStr = arr[0]
+		}
+	}
 
 	transID, err := primitives.HexToHash(transIDStr)
 	if err != nil {
 		return err
 	}
 
+	docID, err := primitives.HexToHash(docIDStr)
+	if err != nil {
+		if findDoc {
+			return err
+		}
+	}
+
 	t, err := read.GetTransactionFromTxID(*transID)
 	if err != nil {
 		return err
+	}
+
+	// Only return doc
+	if findDoc {
+		for _, d := range t.Docs.GetFiles() {
+			if d.DocHash.IsSameAs(docID) {
+				retDoc := new(Document)
+				retDoc.Hash = d.DocHash.String()
+				retDoc.Location = d.Location
+				retDoc.Source = d.Source
+				retDoc.Timestamp = d.GetTimeStampFormatted()
+				retDoc.Path = d.Name
+				w.Write(jsonResp(retDoc))
+				return nil
+			}
+		}
+		return fmt.Errorf("Document not found for that transaction")
 	}
 
 	sing := new(Transaction)
@@ -265,6 +310,10 @@ func handleTransaction(w http.ResponseWriter, r *http.Request, data []byte) erro
 		singDoc.Hash = d.DocHash.String()
 
 		docStruct[i] = *singDoc
+	}
+
+	for i, j := 0, len(docStruct)-1; i < j; i, j = i+1, j-1 {
+		docStruct[i], docStruct[j] = docStruct[j], docStruct[i]
 	}
 
 	sing.Docs = docStruct

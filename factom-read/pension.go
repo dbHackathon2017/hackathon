@@ -16,7 +16,6 @@ var _ = constants.FAC_LIQUID_SEND
 
 func GetTransactionFromTxID(id primitives.Hash) (*common.Transaction, error) {
 	ent, err := factom.GetEntry(id.String())
-	fmt.Println(ent, err)
 	if err != nil {
 		return nil, err
 	}
