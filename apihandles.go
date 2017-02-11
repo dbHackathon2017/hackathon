@@ -28,14 +28,11 @@ type ShortPensions struct {
 func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
 	pens := MainCompany.Pensions
 	sPens := make([]ShortPensions, len(pens))
-	fmt.Printf("Handling all pensions... %d to do\n", len(pens))
 	for i, sp := range sPens {
 		sp.Acct = pens[i].AccountNumber
 		sp.Firstname = pens[i].FirstName
 		sp.Lastname = pens[i].LastName
 		sp.PenID = pens[i].PensionID.String()
-
-		fmt.Printf("- #%d -", i)
 
 		fpen := new(common.Pension)
 		if pp := GetFromPensionCache(pens[i].PensionID.String()); pp != nil {
@@ -56,7 +53,6 @@ func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
 
 		sPens[i] = sp
 	}
-	fmt.Println("\nDone All-pensions")
 
 	container := new(ShortPensionsHolder)
 	container.Holder = sPens
@@ -91,15 +87,16 @@ type LongPension struct {
 }
 
 type Transaction struct {
-	Pension     string     `json:"pension"`
-	ToPension   string     `json:"toPension"`
-	Valchange   string     `json:"valchange"`
-	Factomtype  string     `json:"factomtype"`
-	Usertype    string     `json:"usertype"`
-	Timestamp   string     `json:"timestamp"`
-	Bctimestamp string     `json:"bctimestamp"`
-	Actor       string     `json:"actor"`
-	Docs        []Document `json:"docs"`
+	TransactionID string     `json:"txid"`
+	Pension       string     `json:"pension"`
+	ToPension     string     `json:"toPension"`
+	Valchange     string     `json:"valchange"`
+	Factomtype    string     `json:"factomtype"`
+	Usertype      string     `json:"usertype"`
+	Timestamp     string     `json:"timestamp"`
+	Bctimestamp   string     `json:"bctimestamp"`
+	Actor         string     `json:"actor"`
+	Docs          []Document `json:"docs"`
 }
 
 type Document struct {
@@ -131,7 +128,6 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 	}
 
 	penIDStr := pr.Params
-	fmt.Println(penIDStr)
 
 	penID, err := primitives.HexToHash(penIDStr)
 	if err != nil {
@@ -178,6 +174,7 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 	transStruct := make([]Transaction, len(factomPen.Transactions))
 	for i, t := range factomPen.Transactions {
 		sing := new(Transaction)
+		sing.TransactionID = t.TransactionID.String()
 		sing.Actor = t.Person.String()
 		sing.Factomtype = t.GetFactomTypeString()
 		sing.Usertype = t.GetUserTypeString()

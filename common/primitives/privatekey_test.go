@@ -3,7 +3,7 @@ package primitives_test
 import (
 	"testing"
 
-	. "github.com/DistributedSolutions/DIMWIT/common/primitives"
+	. "github.com/dbHackathon2017/hackathon/common/primitives"
 )
 
 func TestPrivateKey(t *testing.T) {

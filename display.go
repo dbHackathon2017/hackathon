@@ -57,12 +57,14 @@ func loadCache(time.Time) {
 		var _ = i
 		fpen, err := read.GetPensionFromFactom(p.PensionID)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("ERR in load: " + err.Error())
 			continue
 		}
 		AddToPensionCache(fpen.PensionID.String(), *fpen)
 	}
 	loading = false
+
+	MainCompany.Save()
 }
 
 func AddToPensionCache(penid string, pen common.Pension) {
@@ -82,12 +84,23 @@ func InitTemplate() {
 	PensionCache = make(map[string]common.Pension)
 }
 
+func delayed() {
+	err := MainCompany.Pensions[0].MoveChainTo(MainCompany.Pensions[1], "StevenMod", *primitives.RandomFileList(10))
+	if err != nil {
+		panic(err)
+	}
+}
+
 func ServeFrontEnd(port int) {
 	factom.SetFactomdServer(constants.REMOTE_HOST)
 	// Templates
 	InitTemplate()
 
 	MainCompany = company.RandomFakeCompay()
+	if USE_DB {
+		MainCompany.LoadFromDB()
+	}
+
 	if MAKE_TRANS {
 		for i := 0; i < 3; i++ {
 			penId, err := MainCompany.CreatePension()
@@ -105,7 +118,10 @@ func ServeFrontEnd(port int) {
 				"http://altcoin.host:8090/search?input=" + penId.String() + "&type=chainhead")
 		}
 
-		//MainCompany.Pensions[0].MoveChainTo(MainCompany.Pensions[1].PensionID, person, docs)
+		go func() {
+			time.Sleep(10 * time.Second)
+			delayed()
+		}()
 	}
 
 	go func() {
@@ -244,13 +260,13 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		jsonError(err.Error())
+		w.Write(jsonError(err.Error()))
 	}
 
 	p := new(POSTRequest)
 	err = json.Unmarshal(data, p)
 	if err != nil {
-		jsonError(err.Error())
+		w.Write(jsonError(err.Error()))
 	}
 	// Form:
 	//	request -- Request Function
@@ -264,12 +280,12 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 	case "all-pensions":
 		err := handleAllPensions(w, r)
 		if err != nil {
-			jsonError(err.Error())
+			w.Write(jsonError(err.Error()))
 		}
 	case "pension":
 		err := handlePension(w, r, data)
 		if err != nil {
-			jsonError(err.Error())
+			w.Write(jsonError(err.Error()))
 		}
 	default:
 		w.Write(jsonError("Not a post valid request"))
