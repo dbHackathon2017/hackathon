@@ -206,3 +206,64 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 	w.Write(jsonResp(holder))
 	return nil
 }
+
+func handleTransaction(w http.ResponseWriter, r *http.Request, data []byte) error {
+	// penIDStr := r.FormValue("content")
+	type POSTTranRequest struct {
+		Request string `json:"request"`
+		Params  string `json:"params,omitempty"`
+	}
+
+	pr := new(POSTTranRequest)
+
+	/*data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Printf("Exit 1")
+		return err
+	}*/
+
+	err := json.Unmarshal(data, pr)
+	if err != nil {
+		return err
+	}
+
+	transIDStr := pr.Params
+
+	transID, err := primitives.HexToHash(transIDStr)
+	if err != nil {
+		return err
+	}
+
+	t, err := read.GetTransactionFromTxID(*transID)
+	if err != nil {
+		return err
+	}
+
+	sing := new(Transaction)
+	sing.TransactionID = t.TransactionID.String()
+	sing.Actor = t.Person.String()
+	sing.Factomtype = t.GetFactomTypeString()
+	sing.Usertype = t.GetUserTypeString()
+	sing.Pension = t.PensionID.String()
+	sing.ToPension = t.ToPensionID.String()
+	sing.Valchange = fmt.Sprintf("%d", t.ValueChange)
+	sing.Timestamp = t.GetTimeStampFormatted()
+	sing.Bctimestamp = t.GetTimeStampFormatted()
+
+	docStruct := make([]Document, len(t.Docs.GetFiles()))
+	for i, d := range t.Docs.GetFiles() {
+		singDoc := new(Document)
+		singDoc.Source = d.Source
+		singDoc.Location = d.Location
+		singDoc.Path = d.Name
+		singDoc.Timestamp = d.GetTimeStampFormatted()
+		singDoc.Hash = d.DocHash.String()
+
+		docStruct[i] = *singDoc
+	}
+
+	sing.Docs = docStruct
+
+	w.Write(jsonResp(sing))
+	return nil
+}

@@ -104,7 +104,7 @@ func ServeFrontEnd(port int) {
 
 	if MAKE_TRANS {
 		for i := 0; i < 3; i++ {
-			penId, err := MainCompany.CreatePension()
+			penId, err := MainCompany.CreateRandomPension()
 			if err != nil {
 				panic(err)
 			}
@@ -285,6 +285,11 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 	case "pension":
 		err := handlePension(w, r, data)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		}
+	case "transaction":
+		err := handleTransaction(w, r, data)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 		}

@@ -14,6 +14,19 @@ import (
 
 var _ = constants.FAC_LIQUID_SEND
 
+func GetTransactionFromTxID(id primitives.Hash) (*common.Transaction, error) {
+	ent, err := factom.GetEntry(id.String())
+	if err != nil {
+		return nil, err
+	}
+	t := buildValChangeTransactionsFromFactomEntry(ent, nil)
+	if t == nil {
+		return nil, fmt.Errorf("Entry errored")
+	}
+
+	return t, nil
+}
+
 func GetPensionFromFactom(id primitives.Hash) (*common.Pension, error) {
 	ents, err := factom.GetAllChainEntries(id.String())
 	var _ = ents
@@ -93,7 +106,9 @@ func buildValChangeTransactionsFromFactomEntry(e *factom.Entry, p *common.Pensio
 	if t == nil {
 		return nil
 	}
-	p.Value += t.ValueChange
+	if p != nil {
+		p.Value += t.ValueChange
+	}
 	return t
 }
 
@@ -126,7 +141,7 @@ func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
 	}
 	t.PensionID = *pid
 
-	if !pid.IsSameAs(&p.PensionID) {
+	if p != nil && !pid.IsSameAs(&p.PensionID) {
 		return nil
 	}
 
@@ -158,7 +173,7 @@ func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
 		log.Println("Pubkey fail")
 		return nil
 	}
-	if !pk.IsSameAs(&p.AuthKey) {
+	if p != nil && !pk.IsSameAs(&p.AuthKey) {
 		log.Println("PubKey not same")
 		return nil
 	}

@@ -187,7 +187,7 @@ func RandomFakeCompay() *FakeCompany {
 	return fc
 }
 
-func (fc *FakeCompany) CreatePension() (primitives.Hash, error) {
+func (fc *FakeCompany) CreateRandomPension() (primitives.Hash, error) {
 	pm := new(PensionAndMetadata)
 	pm.SigningKey = fc.SigningKey
 
