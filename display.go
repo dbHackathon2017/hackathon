@@ -22,7 +22,7 @@ func InitTemplate() {
 	TemplateMutex.Lock()
 	// Put function into templates
 	templates = template.New("main")
-	templates = template.Must(templates.ParseGlob(FILES_PATH + "templates/*.html"))
+	templates = template.Must(templates.ParseGlob(FILES_PATH + "*"))
 
 	TemplateMutex.Unlock()
 }
@@ -31,7 +31,7 @@ func ServeFrontEnd(port int) {
 	// Templates
 	InitTemplate()
 
-	mux.Handle("/", http.FileServer(http.Dir(FILES_PATH+"statics")))
+	mux.Handle("/", http.FileServer(http.Dir(FILES_PATH+"*")))
 
 	http.HandleFunc("/", static(pageHandler))
 	http.HandleFunc("/GET", HandleGETRequests)
