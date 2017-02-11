@@ -54,7 +54,6 @@ func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
 			sp.Lastint = "Unknown"
 			sp.Active = true
 		}
-
 		sPens[i] = sp
 	}
 
@@ -180,6 +179,9 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 	penStruct.Penid = penID.String()
 	penStruct.Authority = metaPen.CompanyName
 	penStruct.Value = fmt.Sprintf("%d", factomPen.Value)
+	if !factomPen.Active {
+		penStruct.Value = "0"
+	}
 
 	transStruct := make([]Transaction, len(factomPen.Transactions))
 	for i, t := range factomPen.Transactions {

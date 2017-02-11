@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -12,13 +13,16 @@ import (
 // Last record date
 
 type CompanyStats struct {
-	TotalTransactions int `json:"total-transaction"`
-	TotalPensions     int `json:"total-pension"`
-	TotalValue        int `json:"value"`
+	CompanyName       string `json:"company"`
+	TotalTransactions int    `json:"totaltransaction"`
+	TotalPensions     int    `json:"totalpension"`
+	TotalValue        int    `json:"value"`
 }
 
 func handleCompanyStats(w http.ResponseWriter, r *http.Request, data []byte) error {
 	cs := new(CompanyStats)
+	cs.CompanyName = MainCompany.CompanyName.String()
+	fmt.Print(len(MainCompany.Pensions))
 	cs.TotalPensions = len(MainCompany.Pensions)
 
 	for _, p := range MainCompany.Pensions {

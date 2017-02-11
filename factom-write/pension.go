@@ -19,6 +19,7 @@ var _ = constants.CHAIN_PREFIX
 //		"Pension Chain"
 // 		Company
 //		PubKey
+//		UniqueHash
 //		Nonce
 func SubmitPensionToFactom(pen *common.Pension, ec *factom.ECAddress) (*primitives.Hash, error) {
 	e := new(factom.Entry)

@@ -122,7 +122,7 @@ func ServeFrontEnd(port int) {
 		}
 
 		go func() {
-			time.Sleep(10 * time.Second)
+			time.Sleep(15 * time.Second)
 			delayed()
 		}()
 	}
@@ -152,21 +152,6 @@ func doEvery(d time.Duration, f func(time.Time)) {
 	for x := range time.Tick(d) {
 		f(x)
 	}
-}
-
-// mkArray makes an array inside a template
-func mkArray(args ...interface{}) []interface{} {
-	return args
-}
-
-// compareInts is used inside templates to compare ints
-func compareInts(a int, b int) bool {
-	return (a == b)
-}
-
-// compareStrings used inside templates to compare strings
-func compareStrings(a string, b string) bool {
-	return (a == b)
 }
 
 // For all static files. (CSS, JS, IMG, etc...)

@@ -14,6 +14,7 @@ import (
 
 var _ = constants.FAC_LIQUID_SEND
 
+// GetTransactionFromTxID converts a factom entry to a *common.Transaction
 func GetTransactionFromTxID(id primitives.Hash) (*common.Transaction, error) {
 	ent, err := factom.GetEntry(id.String())
 	if err != nil {
@@ -27,6 +28,7 @@ func GetTransactionFromTxID(id primitives.Hash) (*common.Transaction, error) {
 	return t, nil
 }
 
+// GetTransactionFromTxID converts a factom chain (list of entries) to a *common.Pension
 func GetPensionFromFactom(id primitives.Hash) (*common.Pension, error) {
 	ents, err := factom.GetAllChainEntries(id.String())
 	var _ = ents
@@ -35,7 +37,6 @@ func GetPensionFromFactom(id primitives.Hash) (*common.Pension, error) {
 	}
 
 	p := new(common.Pension)
-	p.Active = true
 	// Need to grab the Pension chain enty
 	for _, e := range ents {
 		if bytes.Compare(e.ExtIDs[0], []byte("Pension Chain")) == 0 {
@@ -45,6 +46,7 @@ func GetPensionFromFactom(id primitives.Hash) (*common.Pension, error) {
 			}
 		}
 	}
+	p.Active = true
 
 	if p == nil {
 		return nil, fmt.Errorf("Could not build pension from chain")
@@ -69,8 +71,8 @@ func GetPensionFromFactom(id primitives.Hash) (*common.Pension, error) {
 			} else {
 				transactions = append(transactions, t)
 			}
-		} else if bytes.Compare(e.ExtIDs[0], []byte("Transaction Request Chain")) == 0 {
-			t := applyMoveChain(e, p)
+		} else if bytes.Compare(e.ExtIDs[0], []byte("Transaction Request Move Chain")) == 0 {
+			t := applyRequestChain(e, p)
 			if t == nil {
 				fmt.Println("Bad Request Trans move transaction")
 				continue // Bad transaction
@@ -90,7 +92,6 @@ func applyMoveChain(e *factom.Entry, p *common.Pension) *common.Transaction {
 	if t == nil {
 		return nil
 	}
-	p.Value += t.ValueChange
 	p.Active = false
 	return t
 }
@@ -100,6 +101,7 @@ func applyRequestChain(e *factom.Entry, p *common.Pension) *common.Transaction {
 	if t == nil {
 		return nil
 	}
+	p.Value += t.ValueChange
 	return t
 }
 

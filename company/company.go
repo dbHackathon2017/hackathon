@@ -186,6 +186,7 @@ func RandomFakeCompay() *FakeCompany {
 	return fc
 }
 
+// CreatePension secures a pension into factom.
 func (fc *FakeCompany) CreatePension(fn, ln, addr, pn, ssn, acct string, docs primitives.FileList) (primitives.Hash, error) {
 	pm := new(PensionAndMetadata)
 	pm.SigningKey = fc.SigningKey
@@ -203,6 +204,7 @@ func (fc *FakeCompany) CreatePension(fn, ln, addr, pn, ssn, acct string, docs pr
 		return *primitives.NewZeroHash(), err
 	}
 
+	// Metadata
 	pm.FirstName = fn
 	pm.LastName = ln
 	pm.Address = addr
@@ -217,6 +219,7 @@ func (fc *FakeCompany) CreatePension(fn, ln, addr, pn, ssn, acct string, docs pr
 	return p.PensionID, nil
 }
 
+// Return pension from our local list (NOT from factom)
 func (fc *FakeCompany) GetPensionByID(id string) *PensionAndMetadata {
 	for _, p := range fc.Pensions {
 		if p.PensionID.String() == id {
@@ -258,6 +261,8 @@ func (fc *FakeCompany) CreateRandomPension() (primitives.Hash, error) {
 }
 
 // AddValue returns transaction hash and error
+// Addvalue will add a token amount to pension
+// Goes to Factom
 func (p *PensionAndMetadata) AddValue(valueChange int, person primitives.PersonName, docs primitives.FileList, randTime bool) (*primitives.Hash, error) {
 	trans := new(common.Transaction)
 	trans.PensionID = p.PensionID
@@ -276,6 +281,7 @@ func (p *PensionAndMetadata) AddValue(valueChange int, person primitives.PersonN
 }
 
 // Will move all value from a into b
+// Adds to factom
 func (a *PensionAndMetadata) MoveChainTo(b *PensionAndMetadata, person primitives.PersonName, docs primitives.FileList) error {
 	aPen, err := read.GetPensionFromFactom(a.PensionID)
 	if err != nil {
@@ -286,12 +292,12 @@ func (a *PensionAndMetadata) MoveChainTo(b *PensionAndMetadata, person primitive
 	// Put the send transaction on A
 	send := new(common.Transaction)
 	send.PensionID = a.PensionID
-	send.ToPensionID = a.PensionID
+	send.ToPensionID = b.PensionID
 	send.Timestamp = random.RandomTimestamp()
 	send.Person = person
 	send.Docs = docs
 	send.ValueChange = aPen.Value
-	_, err = write.SubmitChainMoveTransactionToPension(send, ec, a.SigningKey)
+	e1, err := write.SubmitChainMoveTransactionToPension(send, ec, a.SigningKey)
 	if err != nil {
 		return err
 	}
@@ -299,15 +305,16 @@ func (a *PensionAndMetadata) MoveChainTo(b *PensionAndMetadata, person primitive
 	// Now put the request transaction in the recieving
 	req := new(common.Transaction)
 	req.PensionID = b.PensionID
-	req.ToPensionID = b.PensionID
+	req.ToPensionID = a.PensionID
 	req.Timestamp = send.Timestamp
 	req.Person = person
 	req.Docs = docs
 	req.ValueChange = aPen.Value
-	_, err = write.SubmitRequestMoveTransactionToPension(req, ec, b.SigningKey)
+	e, err := write.SubmitRequestMoveTransactionToPension(req, ec, b.SigningKey)
 	if err != nil {
 		return err
 	}
+	fmt.Printf(e.String() + "\n" + e1.String() + "\n")
 
 	return nil
 }
