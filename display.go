@@ -142,7 +142,7 @@ func ServeFrontEnd(port int) {
 
 	portStr := ":" + strconv.Itoa(port)
 
-	fmt.Println("Starting GUI on http://" + portStr + "/")
+	fmt.Println("Starting GUI on http://locahost" + portStr + "/")
 	http.ListenAndServe(portStr, nil)
 }
 
@@ -297,6 +297,11 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		}
 	case "company-stats":
 		err := handleCompanyStats(w, r, data)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		}
+	case "make-pension":
+		err := handleMakePension(w, r, data)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 		}
