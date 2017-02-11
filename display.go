@@ -22,7 +22,7 @@ func InitTemplate() {
 	TemplateMutex.Lock()
 	// Put function into templates
 	templates = template.New("main")
-	templates = template.Must(templates.ParseGlob(FILES_PATH + "/html/*"))
+	//templates = template.Must(templates.ParseGlob(FILES_PATH + "/html/*"))
 
 	TemplateMutex.Unlock()
 }
@@ -72,6 +72,9 @@ func static(h http.HandlerFunc) http.HandlerFunc {
 
 // pageHandler redirects all page requests to proper handlers
 func pageHandler(w http.ResponseWriter, r *http.Request) {
+	TemplateMutex.Lock()
+	templates.ParseGlob(FILES_PATH + "/html/*.html")
+	TemplateMutex.Unlock()
 	request := strings.Split(r.RequestURI, "?")
 	var err error
 	switch request[0] {
