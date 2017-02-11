@@ -6,7 +6,7 @@ import (
 
 func main() {
 	var (
-		jesse = flag.Bool("compiled", true, "Decides wheter to use the compiled statics or not. Useful for modifying")
+		jesse = flag.Bool("j", true, "Only use if you are jesse")
 	)
 
 	flag.Parse()
