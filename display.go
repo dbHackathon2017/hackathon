@@ -45,6 +45,7 @@ func GetFromPensionCache(penid string) *common.Pension {
 
 // loadCache loads pensions into the cache
 func loadCache(time.Time) {
+	fmt.Println("Adding to cache")
 	for _, p := range MainCompany.Pensions {
 		fpen, err := read.GetPensionFromFactom(p.PensionID)
 		if err != nil {
@@ -95,6 +96,7 @@ func ServeFrontEnd(port int) {
 		}
 	}
 
+	go loadCache(time.Now())
 	go doEvery(10*time.Second, loadCache)
 
 	mux = http.NewServeMux()

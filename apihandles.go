@@ -39,10 +39,11 @@ func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
 		if pp := GetFromPensionCache(pens[i].PensionID.String()); pp != nil {
 			fpen = pp
 		} else {
-			fpen, _ = read.GetPensionFromFactom(pens[i].PensionID)
+			/*fpen, _ = read.GetPensionFromFactom(pens[i].PensionID)
 			if fpen != nil {
 				AddToPensionCache(fpen.PensionID.String(), *fpen)
-			}
+			}*/
+			fpen = nil
 		}
 		if fpen != nil {
 			sp.Lastint = fpen.LastInteraction()
