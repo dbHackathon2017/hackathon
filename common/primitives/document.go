@@ -160,9 +160,14 @@ func RandomFile() *File {
 /*func (f *File) GetFileName() string {
 	return f.FileName
 }*/
+const layout = "Jan 2, 2006"
 
 func (f *File) GetFullPath() string {
 	return f.Name
+}
+
+func (f *File) GetTimeStampFormatted() string {
+	return f.Timestamp.Format(layout)
 }
 
 func (f *File) SetFileName(filename string) error {

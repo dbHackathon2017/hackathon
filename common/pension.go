@@ -46,7 +46,6 @@ func (p *Pension) LastInteraction() string {
 		return p.Transactions[0].Timestamp.Format(layout)
 	}
 	return "NA"
-
 }
 
 func (p *Pension) FixPids() {

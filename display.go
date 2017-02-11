@@ -154,6 +154,7 @@ func jsonError(err string) []byte {
 func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	// Only handles GET
 	if r.Method != "GET" {
+		w.Write(jsonError("Cannot do a POST request as /GET"))
 		return
 	}
 	req := r.FormValue("request")
@@ -168,6 +169,7 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 	// Only handles POST
 	if r.Method != "POST" {
+		w.Write(jsonError("Cannot do a GET request as /POST"))
 		return
 	}
 

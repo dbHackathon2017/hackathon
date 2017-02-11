@@ -53,6 +53,38 @@ func RandomValChangeTransaction(pensionID *primitives.Hash) *Transaction {
 	return t
 }
 
+func (t *Transaction) GetTimeStampFormatted() string {
+	return t.Timestamp.Format(layout)
+}
+
+func (t *Transaction) GetUserTypeString() string {
+	if t.UserType == constants.USER_LIQUID_SEND {
+		return "Chain Liquidation"
+	} else if t.UserType == constants.USER_TRANS_DOC_CHANGE {
+		return "DocumentChange"
+	} else if t.UserType == constants.USER_TRANS_VAL_CHANGE {
+		return "ValueChange"
+	} else if t.UserType == constants.USER_LIQUID_REQUEST {
+		return "Retquest Merge In"
+	} else if t.UserType == constants.USER_LIQUID_CONFIRMED {
+		return "Merge Finalized"
+	}
+	return "NA"
+}
+
+func (t *Transaction) GetFactomTypeString() string {
+	if t.UserType == constants.FAC_LIQUID_SEND {
+		return "Chain Liquidation"
+	} else if t.UserType == constants.FAC_TRANS_VAL_CHANGE {
+		return "ValueChange"
+	} else if t.UserType == constants.FAC_LIQUID_REQUEST {
+		return "Retquest Merge In"
+	} else if t.UserType == constants.FAC_LIQUID_CONFIRM {
+		return "Merge Finalized"
+	}
+	return "NA"
+}
+
 func (a *Transaction) IsSameAs(b *Transaction) bool {
 	if !a.PensionID.IsSameAs(&b.PensionID) {
 		return false

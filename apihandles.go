@@ -66,14 +66,12 @@ type PensionHeader struct {
 
 type LongPension struct {
 	Penid        string        `json:"penid"`
-	Transid      string        `json:"transid"`
 	Authority    string        `json:"authority"`
 	Value        string        `json:"value"`
 	Transactions []Transaction `json:"transactions"`
 }
 
 type Transaction struct {
-	Penid       string     `json:"penid"`
 	Pension     string     `json:"pension"`
 	ToPension   string     `json:"toPension"`
 	Valchange   string     `json:"valchange"`
@@ -120,35 +118,49 @@ func handlePension(w http.ResponseWriter, r *http.Request) error {
 
 	header := new(PensionHeader)
 	header.PensionID = penID.String()
+	header.Firstname = metaPen.FirstName
+	header.Lastname = metaPen.LastName
 	header.Acct = metaPen.AccountNumber
+	header.Lastint = factomPen.LastInteraction()
+	header.Addr = metaPen.Address
+	header.Phone = metaPen.PhoneNumber
+	header.Ssn = metaPen.SSN
 
 	penStruct := new(LongPension)
 	penStruct.Penid = penID.String()
+	penStruct.Authority = metaPen.CompanyName
+	penStruct.Value = fmt.Sprintf("%d", factomPen.Value)
 
-	var _, _ = factomPen, holder
+	transStruct := make([]Transaction, len(factomPen.Transactions))
+	for i, t := range factomPen.Transactions {
+		sing := new(Transaction)
+		sing.Actor = t.Person.String()
+		sing.Factomtype = t.GetFactomTypeString()
+		sing.Usertype = t.GetUserTypeString()
+		sing.Pension = t.PensionID.String()
+		sing.ToPension = t.ToPensionID.String()
+		sing.Valchange = fmt.Sprintf("%d", t.ValueChange)
+		sing.Timestamp = t.GetTimeStampFormatted()
+		sing.Bctimestamp = t.GetTimeStampFormatted()
 
-	return nil
+		docStruct := make([]Document, len(t.Docs.GetFiles()))
+		for i, d := range t.Docs.GetFiles() {
+			singDoc := new(Document)
+			singDoc.Source = d.Source
+			singDoc.Location = d.Location
+			singDoc.Path = d.Name
+			singDoc.Timestamp = d.GetTimeStampFormatted()
+			singDoc.Hash = d.DocHash.String()
 
-	/*
-		pens := MainCompany.Pensions
-		sPens := make([]ShortPensions, len(pens))
-		for i, sp := range sPens {
-			sp.Acct = pens[i].AccountNumber
-			sp.Firstname = pens[i].FirstName
-			sp.Lastname = pens[i].LastName
-			sp.PenID = pens[i].PensionID.String()
-
-			fpen, err := read.GetPensionFromFactom(pens[i].PensionID)
-			if err == nil {
-				sp.Lastint = fpen.LastInteraction()
-			} else {
-				sp.Lastint = "Unknown"
-			}
+			docStruct[i] = *singDoc
 		}
 
-		container := new(ShortPensionsHolder)
-		container.Holder = sPens
+		transStruct[i] = *sing
+	}
 
-		w.Write(jsonResp(container))
-		return nil*/
+	penStruct.Transactions = transStruct
+	holder.Pension = *penStruct
+
+	w.Write(jsonResp(holder))
+	return nil
 }
