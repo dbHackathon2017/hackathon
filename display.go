@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -166,6 +167,11 @@ func HandleGETRequests(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type POSTRequest struct {
+	Request string      `json:"request"`
+	Params  interface{} `json:"params,omitempty"`
+}
+
 func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 	// Only handles POST
 	if r.Method != "POST" {
@@ -173,12 +179,23 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		jsonError(err.Error())
+	}
+
+	p := new(POSTRequest)
+	err = json.Unmarshal(data, p)
+	if err != nil {
+		jsonError(err.Error())
+	}
 	// Form:
 	//	request -- Request Function
 	//	json	-- json object
 
-	req := r.FormValue("request")
-	switch req {
+	//req := r.FormValue("request")
+	fmt.Println(p.Request)
+	switch p.Request {
 	case "on":
 		w.Write(jsonResp(true))
 	case "all-pensions":
