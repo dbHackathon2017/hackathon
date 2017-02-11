@@ -193,7 +193,7 @@ func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
 }
 
 func buildPensionFromFactomEntry(e *factom.Entry) *common.Pension {
-	if len(e.ExtIDs) != 4 {
+	if len(e.ExtIDs) != 5 {
 		return nil
 	}
 	var err error

@@ -33,6 +33,7 @@ var (
 )
 
 func GetFromPensionCache(penid string) *common.Pension {
+	fmt.Println("GET: " + penid)
 	cacheLock.RLock()
 	defer cacheLock.RUnlock()
 	if pp, ok := PensionCache[penid]; ok {
@@ -44,18 +45,28 @@ func GetFromPensionCache(penid string) *common.Pension {
 }
 
 // loadCache loads pensions into the cache
+var loading bool = false
+
 func loadCache(time.Time) {
+	if loading {
+		return
+	}
+	loading = true
 	fmt.Println("Adding to cache")
-	for _, p := range MainCompany.Pensions {
+	for i, p := range MainCompany.Pensions {
+		fmt.Printf("- #%d -", i)
 		fpen, err := read.GetPensionFromFactom(p.PensionID)
 		if err != nil {
+			fmt.Println(err)
 			continue
 		}
 		AddToPensionCache(fpen.PensionID.String(), *fpen)
 	}
+	loading = false
 }
 
 func AddToPensionCache(penid string, pen common.Pension) {
+	fmt.Println("PUT: " + penid)
 	cacheLock.Lock()
 	PensionCache[penid] = pen
 	cacheLock.Unlock()
@@ -94,9 +105,14 @@ func ServeFrontEnd(port int) {
 			fmt.Println("Chain made, can be found here: " +
 				"http://altcoin.host:8090/search?input=" + penId.String() + "&type=chainhead")
 		}
+
+		//MainCompany.Pensions[0].MoveChainTo(MainCompany.Pensions[1].PensionID, person, docs)
 	}
 
-	go loadCache(time.Now())
+	go func() {
+		time.Sleep(3 * time.Second)
+		loadCache(time.Now())
+	}()
 	go doEvery(10*time.Second, loadCache)
 
 	mux = http.NewServeMux()

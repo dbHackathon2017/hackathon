@@ -45,6 +45,7 @@ func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
 			}*/
 			fpen = nil
 		}
+		fmt.Println(fpen)
 		if fpen != nil {
 			sp.Lastint = fpen.LastInteraction()
 		} else {
