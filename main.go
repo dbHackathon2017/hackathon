@@ -19,7 +19,6 @@ func main() {
 		makeTrans = flag.Bool("t", false, "Turn this on if you want factom transactions made at bootup")
 		db        = flag.Bool("db", false, "Turn this on if you want to use db cache")
 		robin     = flag.Bool("r", false, "Only use if you are robin")
-		steven    = flag.Bool("s", false, "Only use if you are steven")
 	)
 
 	flag.Parse()
@@ -32,11 +31,6 @@ func main() {
 	if *robin {
 		fmt.Println("Using Robin's path")
 		FILES_PATH = "/Users/robin/dev/dbh/hackathon2"
-	}
-
-	if *steven {
-		fmt.Println("Using Robin's path")
-		FILES_PATH = "/Users/stevenmasley/go/src/github.com/dbHackathon2017/hackathon2"
 	}
 
 	if *db {
