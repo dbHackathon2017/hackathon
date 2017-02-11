@@ -33,10 +33,10 @@ func TestSubmitPension(t *testing.T) {
 	// chain must be in first
 	time.Sleep(4 * time.Second)
 
-	trans := common.RandomValChangeTransaction()
+	trans := common.RandomValChangeTransaction(primitives.RandomHash())
 	trans.PensionID = p.PensionID
 
-	ehash, err := SubmitValueChangeTransactionToPension(*trans, ec, *pk)
+	ehash, err := SubmitValueChangeTransactionToPension(trans, ec, *pk)
 	if err != nil {
 		t.Error(err)
 	}

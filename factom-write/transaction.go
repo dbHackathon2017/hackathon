@@ -1,6 +1,7 @@
 package write
 
 import (
+	"bytes"
 	"fmt"
 	"time"
 
@@ -20,18 +21,47 @@ var _ = constants.CHAIN_PREFIX
 //			"Transaction Value Change"
 //			UserType
 //			ValueChange
-//			PensionID (Stop cross-chain-replay)
+//			PensionID (from)
+//			ToPensionID  (to)
 //			PersonSubmit (who did it)
 //			Timestamp
 //			PubKey
 //			Sig up to TS
 //		Content
 //			DocumentData
-func SubmitValueChangeTransactionToPension(trans common.Transaction, ec *factom.ECAddress, sigKey primitives.PrivateKey) (*primitives.Hash, error) {
+func SubmitValueChangeTransactionToPension(trans *common.Transaction, ec *factom.ECAddress, sigKey primitives.PrivateKey) (*primitives.Hash, error) {
+	trans.UserType = constants.USER_TRANS_VAL_CHANGE
+	trans.FactomType = constants.FAC_TRANS_VAL_CHANGE
+	return submitTransactionToFactom("Transaction Value Change", trans, ec, sigKey)
+
+}
+
+// Send A to B in A
+func SubmitChainMoveTransactionToPension(trans *common.Transaction, ec *factom.ECAddress, sigKey primitives.PrivateKey) (*primitives.Hash, error) {
+	trans.UserType = constants.USER_LIQUID_SEND
+	trans.FactomType = constants.FAC_LIQUID_SEND
+	return submitTransactionToFactom("Transaction Move Chain", trans, ec, sigKey)
+}
+
+// Request from A to B in B
+func SubmitRequestMoveTransactionToPension(trans *common.Transaction, ec *factom.ECAddress, sigKey primitives.PrivateKey) (*primitives.Hash, error) {
+	trans.UserType = constants.USER_LIQUID_REQUEST
+	trans.FactomType = constants.FAC_LIQUID_REQUEST
+	return submitTransactionToFactom("Transaction Request Move Chain", trans, ec, sigKey)
+}
+
+// Not used
+func SubmitConfirmMoveTransactionToPension(trans *common.Transaction, ec *factom.ECAddress, sigKey primitives.PrivateKey) (*primitives.Hash, error) {
+	trans.UserType = constants.USER_LIQUID_CONFIRMED
+	trans.FactomType = constants.FAC_LIQUID_CONFIRM
+	return submitTransactionToFactom("Transaction Confirm Move Chain", trans, ec, sigKey)
+}
+
+func submitTransactionToFactom(message string, trans *common.Transaction, ec *factom.ECAddress, sigKey primitives.PrivateKey) (*primitives.Hash, error) {
 	e := new(factom.Entry)
 
 	ut := primitives.Uint32ToBytes(trans.UserType)
-	vc := primitives.Uint32ToBytes(uint32(trans.ValueChange))
+	ft := primitives.Uint32ToBytes(uint32(trans.ValueChange))
 	person, err := trans.Person.MarshalBinary()
 	if err != nil {
 		return nil, err
@@ -42,18 +72,24 @@ func SubmitValueChangeTransactionToPension(trans common.Transaction, ec *factom.
 		return nil, err
 	}
 
-	e.ExtIDs = append(e.ExtIDs, []byte("Transaction Value Change")) // 0
-	e.ExtIDs = append(e.ExtIDs, ut)                                 // 1
-	e.ExtIDs = append(e.ExtIDs, vc)                                 // 2
-	e.ExtIDs = append(e.ExtIDs, trans.PensionID.Bytes())            // 3
-	e.ExtIDs = append(e.ExtIDs, person)                             // 4
-	e.ExtIDs = append(e.ExtIDs, ts)                                 // 5
+	e.ExtIDs = append(e.ExtIDs, []byte(message))           // 0
+	e.ExtIDs = append(e.ExtIDs, ut)                        // 1
+	e.ExtIDs = append(e.ExtIDs, ft)                        // 2
+	e.ExtIDs = append(e.ExtIDs, trans.PensionID.Bytes())   // 3
+	e.ExtIDs = append(e.ExtIDs, trans.ToPensionID.Bytes()) // 4
+	e.ExtIDs = append(e.ExtIDs, person)                    // 5
+	e.ExtIDs = append(e.ExtIDs, ts)                        // 6
 
-	msg := upToNonce(e.ExtIDs)
+	buf := new(bytes.Buffer)
+	for i := 0; i < 7; i++ {
+		buf.Write(e.ExtIDs[i])
+	}
+
+	msg := buf.Next(buf.Len())
 	sig := sigKey.Sign(msg)
 
-	e.ExtIDs = append(e.ExtIDs, sigKey.Public.Bytes()) // 6
-	e.ExtIDs = append(e.ExtIDs, sig)                   // 7
+	e.ExtIDs = append(e.ExtIDs, sigKey.Public.Bytes()) // 7
+	e.ExtIDs = append(e.ExtIDs, sig)                   // 8
 
 	docs, err := trans.Docs.MarshalBinary()
 	if err != nil {
@@ -83,6 +119,8 @@ func SubmitValueChangeTransactionToPension(trans common.Transaction, ec *factom.
 	if err != nil {
 		return nil, err
 	}
+
+	trans.TransactionID = *ehash
 
 	return ehash, nil
 }

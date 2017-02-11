@@ -37,10 +37,11 @@ See factom-write pension_test.go for example
 |---|---|
 |ExtID (0)|"Transaction Value Change"|
 |ExtID (1)|UserType|
-|ExtID (3)|Value Change|
-|ExtID (4)|PensionID|
+|ExtID (2)|Value Change|
+|ExtID (3)|PensionID|
+|ExtID (4)|ToPensionID|
 |ExtID (5)|PersonSubmit|
-|ExtID (6)| Timestamp|
-|ExtID (6)|PubKey|
-|ExtID (7)|Signature ExtID(0-6)|
+|ExtID (6)|Timestamp|
+|ExtID (7)|PubKey|
+|ExtID (8)|Signature ExtID(0-6)|
 |Content|Document data

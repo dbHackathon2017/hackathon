@@ -2,7 +2,8 @@ package common
 
 import (
 	"time"
-	"pension"
+	//"pension"
+
 	"github.com/dbHackathon2017/hackathon/common/constants"
 	"github.com/dbHackathon2017/hackathon/common/primitives"
 	"github.com/dbHackathon2017/hackathon/common/primitives/random"
@@ -18,8 +19,10 @@ import (
 //		The transaction would add $0.00 value. We would process it the same was as a $0.00
 //		value one.
 type Transaction struct {
-	PensionID   primitives.Hash
+	PensionID     primitives.Hash
+	ToPensionID   primitives.Hash
 	TransactionID primitives.Hash
+
 	ValueChange int    // In every transaction
 	FactomType  uint32 // Transaction type relative to factom
 	UserType    uint32 // Transaction type relative to user
@@ -32,6 +35,7 @@ type Transaction struct {
 func RandomValChangeTransaction(pensionID *primitives.Hash) *Transaction {
 	t := new(Transaction)
 	t.PensionID = *pensionID
+	t.ToPensionID = *pensionID
 	t.TransactionID = *primitives.RandomHash()
 	t.ValueChange = 100
 	t.FactomType = constants.FAC_TRANS_VAL_CHANGE
@@ -47,4 +51,40 @@ func RandomValChangeTransaction(pensionID *primitives.Hash) *Transaction {
 	t.Timestamp.Add(time.Duration(day) * time.Hour)
 
 	return t
+}
+
+func (a *Transaction) IsSameAs(b *Transaction) bool {
+	if !a.PensionID.IsSameAs(&b.PensionID) {
+		return false
+	}
+
+	if !a.ToPensionID.IsSameAs(&b.ToPensionID) {
+		return false
+	}
+
+	if !a.TransactionID.IsSameAs(&b.TransactionID) {
+		return false
+	}
+
+	if a.ValueChange != b.ValueChange {
+		return false
+	}
+
+	if a.FactomType != b.FactomType {
+		return false
+	}
+
+	if a.UserType != b.UserType {
+		return false
+	}
+
+	if !a.Docs.IsSameAs(&b.Docs) {
+		return false
+	}
+
+	if !a.Person.IsSameAs(&b.Person) {
+		return false
+	}
+
+	return true
 }
