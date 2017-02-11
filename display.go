@@ -293,6 +293,11 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 		}
+	case "company-stats":
+		err := handleCompanyStats(w, r, data)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		}
 	default:
 		w.Write(jsonError("Not a valid POST request"))
 	}

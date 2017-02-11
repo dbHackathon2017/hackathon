@@ -23,6 +23,7 @@ type ShortPensions struct {
 	PenID     string `json:"id"`
 	Lastint   string `json:"lastint"`
 	Lastname  string `json:"lastname"`
+	Active    bool   `json:"active"`
 }
 
 func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
@@ -47,8 +48,10 @@ func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
 		fmt.Println(fpen)
 		if fpen != nil {
 			sp.Lastint = fpen.LastInteraction()
+			sp.Active = fpen.Active
 		} else {
 			sp.Lastint = "Unknown"
+			sp.Active = true
 		}
 
 		sPens[i] = sp
@@ -77,6 +80,7 @@ type PensionHeader struct {
 	Phone     string `json:"phone"`
 	Company   string `json:"company"`
 	Ssn       string `json:"ssn"`
+	Active    bool   `json:"active"`
 }
 
 type LongPension struct {
@@ -164,6 +168,7 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 	header.Addr = metaPen.Address
 	header.Phone = metaPen.PhoneNumber
 	header.Ssn = metaPen.SSN
+	header.Active = factomPen.Active
 	holder.Header = *header
 
 	penStruct := new(LongPension)

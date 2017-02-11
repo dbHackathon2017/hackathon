@@ -36,6 +36,7 @@ func GetPensionFromFactom(id primitives.Hash) (*common.Pension, error) {
 	}
 
 	p := new(common.Pension)
+	p.Active = true
 	// Need to grab the Pension chain enty
 	for _, e := range ents {
 		if bytes.Compare(e.ExtIDs[0], []byte("Pension Chain")) == 0 {
@@ -91,6 +92,7 @@ func applyMoveChain(e *factom.Entry, p *common.Pension) *common.Transaction {
 		return nil
 	}
 	p.Value += t.ValueChange
+	p.Active = false
 	return t
 }
 
