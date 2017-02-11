@@ -129,3 +129,54 @@ func handleAddValue(w http.ResponseWriter, r *http.Request, data []byte) error {
 	w.Write(jsonResp(txid.String()))
 	return nil
 }
+
+type TransferChain struct {
+	FromPenid string   `json:"from-penid"`
+	ToPenid   string   `json:"to-penid"`
+	Person    string   `json:"person"`
+	Docs      []PutDoc `json:"docs"`
+}
+
+func handleTransfer(w http.ResponseWriter, r *http.Request, data []byte) error {
+	type POSTAddVal struct {
+		Request string    `json:"request"`
+		Params  ValChange `json:"params,omitempty"`
+	}
+
+	pr := new(POSTAddVal)
+
+	err := json.Unmarshal(data, pr)
+	if err != nil {
+		return err
+	}
+
+	docs := new(primitives.FileList)
+
+	list := docsToFileList(pr.Params.Docs)
+	docs = list
+
+	from := MainCompany.GetPensionByID(pr.Params.Penid)
+	if from == nil {
+		return fmt.Errorf("Pension by id %s not found in company\n", pr.Params.Penid)
+	}
+
+	to := MainCompany.GetPensionByID(pr.Params.Penid)
+	if to == nil {
+		return fmt.Errorf("Pension by id %s not found in company\n", pr.Params.Penid)
+	}
+
+	pp, err := primitives.NewPersonName(pr.Params.Person)
+	if err != nil {
+		return err
+	}
+
+	err = from.MoveChainTo(to,
+		*pp,
+		*docs)
+	if err != nil {
+		return err
+	}
+
+	w.Write(jsonResp("Success"))
+	return nil
+}
