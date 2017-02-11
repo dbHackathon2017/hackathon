@@ -47,8 +47,8 @@ def gendummyDict():
             "lastname":genRandomName(1),
             "address":genRandomAdress(),
             "phone":genRandomPhone(),
-            "BSN":genRandomNumberString(9),
-            "AccountNumber":genRandomNumberString(10),
+            "ssn":genRandomNumberString(9),
+            "acctnum":genRandomNumberString(10),
             "docs": docs}
         pensionDict = {"request": "pension", "params":params}
         dummyList.append(pensionDict)

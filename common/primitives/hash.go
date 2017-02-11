@@ -165,7 +165,8 @@ func (h *Hash) Bytes() []byte {
 
 func (h *Hash) SetBytes(ni []byte) error {
 	if len(ni) != h.Length() {
-		return fmt.Errorf("Length is invalid, must be of length %d", h.Length())
+		fmt.Printf("%x\n", ni)
+		return fmt.Errorf("[HashSet] Length is invalid, must be of length %d. %x", h.Length(), ni)
 	}
 
 	copy(h[:], ni)
@@ -205,7 +206,7 @@ func (h *Hash) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
 
 	newData = data
 	if len(newData) < h.Length() {
-		err = fmt.Errorf("Length is invalid, must be of length %d, found length %d", h.Length(), len(newData))
+		err = fmt.Errorf("[HashUnMarsh] Length is invalid, must be of length %d, found length %d", h.Length(), len(newData))
 		return
 	}
 

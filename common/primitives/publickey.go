@@ -58,7 +58,7 @@ func (p *PublicKey) FixedBytes() [ed.PublicKeySize]byte {
 
 func (p *PublicKey) SetBytes(b []byte) error {
 	if len(b) != ed.PublicKeySize {
-		return fmt.Errorf("Length is invalid, must be of length %d", p.Length())
+		return fmt.Errorf("[Pub] Length is invalid, must be of length %d. %x", p.Length(), b)
 	}
 
 	copy(p[:], b)
