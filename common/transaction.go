@@ -191,7 +191,7 @@ func (t *Transaction) GetUserTypeString() string {
 		}
 		return "Deposit"
 	} else if t.UserType == constants.USER_LIQUID_REQUEST {
-		return "Retquest Merge In"
+		return "Merge Finalized"
 	} else if t.UserType == constants.USER_LIQUID_CONFIRMED {
 		return "Merge Finalized"
 	}
