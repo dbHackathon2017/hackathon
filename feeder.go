@@ -14,6 +14,7 @@ import (
 var minTPS int = 2
 var maxTPS int = 15
 
+// Feeder feeds random transactions into the blockchain
 func startFeeder() {
 	for {
 		dead := len(MainCompany.Pensions)
@@ -29,6 +30,7 @@ func startFeeder() {
 			}
 		}
 
+		// How many transactions
 		amt := random.RandomIntBetween(minTPS*10, maxTPS*10)
 		log.Printf("[FEEDER] Adding %d transactions from feeder...\n", amt)
 		for i := 0; i < amt; i++ {

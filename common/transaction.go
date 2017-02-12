@@ -180,6 +180,7 @@ func (t *Transaction) GetTimeStampFormatted() string {
 	return t.Timestamp.Format(layout)
 }
 
+// String version of the type
 func (t *Transaction) GetUserTypeString() string {
 	if t.UserType == constants.USER_LIQUID_SEND {
 		return "Chain Liquidation"
@@ -198,6 +199,7 @@ func (t *Transaction) GetUserTypeString() string {
 	return "--"
 }
 
+// String version of the type
 func (t *Transaction) GetFactomTypeString() string {
 	if t.UserType == constants.FAC_LIQUID_SEND {
 		return "Chain Liquidation"

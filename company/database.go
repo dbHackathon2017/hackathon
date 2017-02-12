@@ -15,6 +15,8 @@ type BoltDB struct {
 	sync.RWMutex
 }
 
+// Woo! Bolt db
+// Using another package to do db stuff
 func NewBoltDB(filename string) *BoltDB {
 	db := new(BoltDB)
 

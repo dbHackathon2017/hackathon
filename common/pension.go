@@ -177,6 +177,7 @@ func (p *Pension) MarshalBinary() ([]byte, error) {
 	return buf.Next(buf.Len()), nil
 }
 
+// Format the GoLang time to string
 func (p *Pension) LastInteraction() string {
 	if len(p.Transactions) >= 1 {
 		sort.Sort(TransList(p.Transactions))
@@ -185,6 +186,7 @@ func (p *Pension) LastInteraction() string {
 	return "--"
 }
 
+// Fix all pensionID links of transactions. All transactions need the pension id of the pension they are in.
 func (p *Pension) FixPids() {
 	for i := 0; i < len(p.Transactions); i++ {
 		p.Transactions[i].PensionID = p.PensionID

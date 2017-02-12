@@ -27,6 +27,9 @@ type FakeCompany struct {
 	FactomDB *BoltDB
 }
 
+// PensionAndMetadata is the private metadata a company stores
+// about a pension. The PensionID is the link to get the factom
+// data and audit trail
 type PensionAndMetadata struct {
 	PensionID  primitives.Hash
 	SigningKey primitives.PrivateKey
@@ -70,6 +73,7 @@ var PENSION_CACHE []byte = []byte("CompName")     // Pension data in factom
 
 var lock sync.RWMutex
 
+// Save to a database for reboots
 func (fc *FakeCompany) Save(penCache []common.Pension, full bool) {
 	if fc.DB == nil {
 		return
@@ -149,6 +153,7 @@ func (fc *FakeCompany) Save(penCache []common.Pension, full bool) {
 
 }
 
+// Load from database so we don't have to generate again
 func (fc *FakeCompany) LoadFromDB() {
 	fmt.Print("Loading pensions from DB...")
 	if fc.DB == nil {
@@ -239,6 +244,7 @@ func (fc *FakeCompany) LoadFromDB() {
 	return
 }
 
+// Load factom data from local db. We save locally for quicker access
 func (fc *FakeCompany) LoadPenCacheFromDB() []common.Pension {
 	if fc.FactomDB == nil {
 		fc.FactomDB = NewBoltDB("cache/factom_cache.db")

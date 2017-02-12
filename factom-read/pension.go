@@ -87,6 +87,7 @@ func GetPensionFromFactom(id primitives.Hash) (*common.Pension, error) {
 	return p, nil
 }
 
+// Get a factom entry and apply the changes to our pension (value changes)
 func applyMoveChain(e *factom.Entry, p *common.Pension) *common.Transaction {
 	t := applyTransaction(e, p)
 	if t == nil {
@@ -96,6 +97,7 @@ func applyMoveChain(e *factom.Entry, p *common.Pension) *common.Transaction {
 	return t
 }
 
+// Get a factom entry and apply the changes to our pension (value changes)
 func applyRequestChain(e *factom.Entry, p *common.Pension) *common.Transaction {
 	t := applyTransaction(e, p)
 	if t == nil {
@@ -105,6 +107,7 @@ func applyRequestChain(e *factom.Entry, p *common.Pension) *common.Transaction {
 	return t
 }
 
+// Build a transaction we can parse from a factom entry.
 func buildValChangeTransactionsFromFactomEntry(e *factom.Entry, p *common.Pension) *common.Transaction {
 	t := applyTransaction(e, p)
 	if t == nil {

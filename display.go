@@ -75,6 +75,7 @@ func GetCacheList() []common.Pension {
 
 var ready_to_disp = true
 
+// First load local, then go to blockchain
 func firsLoadLocal() {
 	time.Sleep(5 * time.Second)
 	ready_to_disp = false
@@ -95,6 +96,7 @@ func firsLoadLocal() {
 // loadCache loads pensions into the cache
 var loading bool = false
 
+// Load our data from cache on bootup
 func loadCache(time.Time) {
 	if loading {
 		return
