@@ -15,7 +15,7 @@ type CompanyStats struct {
 	CompanyName       string `json:"company"`
 	TotalTransactions int    `json:"totaltransaction"`
 	TotalPensions     int    `json:"totalpension"`
-	TotalValue        int    `json:"value"`
+	TotalValue        string `json:"value"`
 }
 
 func handleCompanyStats(w http.ResponseWriter, r *http.Request, data []byte) error {
