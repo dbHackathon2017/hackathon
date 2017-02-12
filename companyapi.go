@@ -23,13 +23,15 @@ func handleCompanyStats(w http.ResponseWriter, r *http.Request, data []byte) err
 	cs.CompanyName = MainCompany.CompanyName.String()
 	cs.TotalPensions = len(MainCompany.Pensions)
 
+	total := 0
 	for _, p := range MainCompany.Pensions {
 		fpen := GetFromPensionCache(p.PensionID.String())
 		if fpen != nil {
+			total += fpen.Value
 			cs.TotalTransactions += len(fpen.Transactions)
-			cs.TotalValue += valToString(fpen.Value)
 		}
 	}
+	cs.TotalValue = valToString(total)
 
 	w.Write(jsonResp(cs))
 	return nil

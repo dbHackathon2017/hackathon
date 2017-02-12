@@ -98,6 +98,7 @@ func loadCache(time.Time) {
 	if loading {
 		return
 	}
+	fmt.Println("Updating memory cache...")
 	loading = true
 	//fmt.Println("Adding to cache")
 	for i, p := range MainCompany.Pensions {
@@ -167,7 +168,7 @@ func ServeFrontEnd(port int) {
 			MainCompany.Pensions[i].AddValue(10000, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(2500, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(-1111, "Steven WOOT!", *primitives.RandomFileList(10), true)
-			MainCompany.Pensions[i].AddValue(2500, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(0, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(5025, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(6025, "Steven WOOT!", *primitives.RandomFileList(10), true)
 		}
@@ -312,7 +313,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 	//	json	-- json object
 
 	//req := r.FormValue("request")
-	fmt.Println(p.Request)
+	//fmt.Println(p.Request)
 	switch p.Request {
 	case "on":
 		w.Write(jsonResp(true))

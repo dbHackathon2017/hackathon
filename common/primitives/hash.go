@@ -165,7 +165,6 @@ func (h *Hash) Bytes() []byte {
 
 func (h *Hash) SetBytes(ni []byte) error {
 	if len(ni) != h.Length() {
-		fmt.Printf("%x\n", ni)
 		return fmt.Errorf("[HashSet] Length is invalid, must be of length %d. %x", h.Length(), ni)
 	}
 
