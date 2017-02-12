@@ -1,13 +1,16 @@
 package common
 
 import (
+	"bytes"
+	"fmt"
 	"time"
-	//"pension"
 
 	"github.com/dbHackathon2017/hackathon/common/constants"
 	"github.com/dbHackathon2017/hackathon/common/primitives"
 	"github.com/dbHackathon2017/hackathon/common/primitives/random"
 )
+
+var _ = fmt.Sprintf("")
 
 // Transaction is an individual transaction in a pension chain. Each transaction
 // has a type. This type is only relevent for readability.
@@ -51,6 +54,126 @@ func RandomValChangeTransaction(pensionID *primitives.Hash) *Transaction {
 	t.Timestamp.Add(time.Duration(day) * time.Hour)
 
 	return t
+}
+
+func (t *Transaction) UnmarshalBinary(data []byte) error {
+	_, err := t.UnmarshalBinaryData(data)
+	return err
+}
+
+func (t *Transaction) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("[Pension] A panic has occurred while unmarshaling: %s", r)
+			return
+		}
+	}()
+	newData = data
+
+	newData, err = t.PensionID.UnmarshalBinaryData(newData)
+	if err != nil {
+		return data, err
+	}
+
+	newData, err = t.ToPensionID.UnmarshalBinaryData(newData)
+	if err != nil {
+		return data, err
+	}
+
+	newData, err = t.TransactionID.UnmarshalBinaryData(newData)
+	if err != nil {
+		return data, err
+	}
+
+	u, err := primitives.BytesToUint32(newData[:4])
+	if err != nil {
+		return data, err
+	}
+	t.ValueChange = int(u)
+	newData = newData[4:]
+
+	u, err = primitives.BytesToUint32(newData[:4])
+	if err != nil {
+		return data, err
+	}
+	t.FactomType = u
+	newData = newData[4:]
+
+	u, err = primitives.BytesToUint32(newData[:4])
+	if err != nil {
+		return data, err
+	}
+	t.UserType = u
+	newData = newData[4:]
+
+	err = t.Timestamp.UnmarshalBinary(newData[:15])
+	if err != nil {
+		return data, err
+	}
+	newData = newData[15:]
+
+	newData, err = t.Docs.UnmarshalBinaryData(newData)
+	if err != nil {
+		return data, err
+	}
+
+	newData, err = t.Person.UnmarshalBinaryData(newData)
+	if err != nil {
+		return data, err
+	}
+
+	return newData, nil
+}
+
+func (t *Transaction) MarshalBinary() ([]byte, error) {
+	buf := new(bytes.Buffer)
+
+	data, err := t.PensionID.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	data, err = t.ToPensionID.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	data, err = t.TransactionID.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	data = primitives.Uint32ToBytes(uint32(t.ValueChange))
+	buf.Write(data)
+
+	data = primitives.Uint32ToBytes(t.FactomType)
+	buf.Write(data)
+
+	data = primitives.Uint32ToBytes(t.UserType)
+	buf.Write(data)
+
+	data, err = t.Timestamp.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	data, err = t.Docs.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	data, err = t.Person.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	return buf.Next(buf.Len()), nil
 }
 
 func (t *Transaction) GetTimeStampFormatted() string {

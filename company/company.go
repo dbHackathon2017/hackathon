@@ -57,13 +57,14 @@ func RandomPenstionAndMetaData() *PensionAndMetadata {
 	return p
 }
 
-var PENSION_BUCKET []byte = []byte("Pensions")
+var PENSION_BUCKET []byte = []byte("Pensions") // Pension metadaa
 var PRIV_KEY []byte = []byte("Secret")
 var COMPANY_NAME []byte = []byte("CompName")
+var PENSION_CACHE []byte = []byte("CompName") // Pension data in factom
 
 var lock sync.RWMutex
 
-func (fc *FakeCompany) Save() {
+func (fc *FakeCompany) Save(penCache []common.Pension, full bool) {
 	if fc.DB == nil {
 		return
 	}
@@ -102,9 +103,38 @@ func (fc *FakeCompany) Save() {
 	if err != nil {
 		log.Printf("Failed to save Company Name \n")
 	}
+
+	//if full {
+	recs := make([]Record, 0)
+	for _, p := range penCache {
+		data, err := p.MarshalBinary()
+		if err != nil {
+			log.Printf("Failed to save pension %s\n", p.PensionID.String())
+		}
+
+		if len(data) < 100 {
+			continue
+		}
+		rc := new(Record)
+		rc.Bucket = PENSION_CACHE
+		rc.Key = p.PensionID.Bytes()
+		rc.Data = data
+		recs = append(recs, *rc)
+		/*err = fc.DB.Put(PENSION_CACHE, p.PensionID.Bytes(), data)
+		if err != nil {
+			log.Printf("Failed to save pension %s\n", p.PensionID.String())
+		}*/
+	}
+	err = fc.DB.PutInBatch(recs)
+	if err != nil {
+		log.Printf("Failed to save factom-pensions \n")
+	}
+	//}
+
 }
 
 func (fc *FakeCompany) LoadFromDB() {
+	fmt.Print("Loading pensions from DB...")
 	if fc.DB == nil {
 		fc.DB = NewBoltDB("company_cache.db")
 	}
@@ -112,19 +142,16 @@ func (fc *FakeCompany) LoadFromDB() {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	keys, err := fc.DB.ListAllKeys(PENSION_BUCKET)
+	/*keys, err := fc.DB.ListAllKeys(PENSION_BUCKET)
 	if err != nil {
 		log.Printf("Failed to load pensions\n")
-	}
+	}*/
 
 	fc.Pensions = make([]*PensionAndMetadata, 0)
 
-	for _, key := range keys {
-		data, err := fc.DB.Get(PENSION_BUCKET, key)
-		if err != nil {
-			continue
-		}
-
+	fmt.Printf("Loading Pensions...\n")
+	dataSet, _, err := fc.DB.GetAll(PENSION_BUCKET)
+	for _, data := range dataSet {
 		t := new(PensionAndMetadata)
 		err = t.UnmarshalBinary(data)
 		if err != nil {
@@ -164,6 +191,28 @@ func (fc *FakeCompany) LoadFromDB() {
 			}
 		}
 	}
+
+	return
+}
+
+func (fc *FakeCompany) LoadPenCacheFromDB() []common.Pension {
+	list := make([]common.Pension, 0)
+	fmt.Printf("Loading factom-pensions from cache...")
+	dataSet, _, err := fc.DB.GetAll(PENSION_CACHE)
+	if err != nil {
+		log.Println("Encountered error", err.Error())
+		return nil
+	}
+	for _, data := range dataSet {
+		p := new(common.Pension)
+		err = p.UnmarshalBinary(data)
+		if err != nil {
+			//log.Printf("Failed to unmarshal pension %s\n", err.Error())
+			continue
+		}
+		list = append(list, *p)
+	}
+	return list
 }
 
 func NewCompany(path string) *FakeCompany {

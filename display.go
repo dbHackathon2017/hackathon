@@ -34,7 +34,20 @@ var (
 	templateDelims = []string{"{--{", "}--}"}
 )
 
+func AddToPensionCache(penid string, pen common.Pension) {
+	if !ready_to_disp {
+		return
+	}
+
+	cacheLock.Lock()
+	PensionCache[penid] = pen
+	cacheLock.Unlock()
+}
+
 func GetFromPensionCache(penid string) *common.Pension {
+	if !ready_to_disp {
+		return nil
+	}
 	cacheLock.RLock()
 	defer cacheLock.RUnlock()
 	if pp, ok := PensionCache[penid]; ok {
@@ -43,6 +56,39 @@ func GetFromPensionCache(penid string) *common.Pension {
 		return p
 	}
 	return nil
+}
+
+func GetCacheList() []common.Pension {
+	if !ready_to_disp {
+		return nil
+	}
+	cacheLock.RLock()
+	defer cacheLock.RUnlock()
+	list := make([]common.Pension, 0)
+	for _, p := range PensionCache {
+		list = append(list, p)
+	}
+
+	return list
+}
+
+var ready_to_disp = true
+
+func firsLoadLocal() {
+	time.Sleep(5 * time.Second)
+	ready_to_disp = false
+	loading = true
+	//time.Sleep(3 * time.Second)
+	list := MainCompany.LoadPenCacheFromDB()
+	cacheLock.Lock()
+	for _, p := range list {
+		PensionCache[p.PensionID.String()] = p
+		// AddToPensionCache(p.PensionID.String(), p)
+	}
+	cacheLock.Unlock()
+	loading = false
+	ready_to_disp = true
+	fmt.Printf("Done Loading from cache, loaded %d pensions\n", len(list))
 }
 
 // loadCache loads pensions into the cache
@@ -66,13 +112,7 @@ func loadCache(time.Time) {
 	}
 	loading = false
 
-	MainCompany.Save()
-}
-
-func AddToPensionCache(penid string, pen common.Pension) {
-	cacheLock.Lock()
-	PensionCache[penid] = pen
-	cacheLock.Unlock()
+	MainCompany.Save(GetCacheList(), FULL_CACHE)
 }
 
 func InitTemplate() {
@@ -101,24 +141,31 @@ func ServeFrontEnd(port int) {
 	MainCompany = company.RandomFakeCompay()
 	if USE_DB {
 		MainCompany.LoadFromDB()
-		go loadCache(time.Now())
+		if FULL_CACHE {
+			go func() {
+				firsLoadLocal()
+			}()
+		}
 	}
 
 	if MAKE_TRANS {
-		for i := 0; i < 3; i++ {
+		fmt.Println()
+		for i := 0; i < 5; i++ {
 			penId, err := MainCompany.CreateRandomPension()
 			if err != nil {
 				panic(err)
 			}
 
+			fmt.Println("Chain made, can be found here: " +
+				"http://altcoin.host:8090/search?input=" + penId.String() + "&type=chainhead")
+		}
+
+		for i := 0; i < 20; i++ {
 			MainCompany.Pensions[i].AddValue(100, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
-
-			fmt.Println("Chain made, can be found here: " +
-				"http://altcoin.host:8090/search?input=" + penId.String() + "&type=chainhead")
 		}
 
 		go func() {

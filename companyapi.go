@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -22,7 +21,6 @@ type CompanyStats struct {
 func handleCompanyStats(w http.ResponseWriter, r *http.Request, data []byte) error {
 	cs := new(CompanyStats)
 	cs.CompanyName = MainCompany.CompanyName.String()
-	fmt.Print(len(MainCompany.Pensions))
 	cs.TotalPensions = len(MainCompany.Pensions)
 
 	for _, p := range MainCompany.Pensions {

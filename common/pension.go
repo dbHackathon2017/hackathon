@@ -1,6 +1,8 @@
 package common
 
 import (
+	"bytes"
+	"fmt"
 	"log"
 	"math/rand"
 	"sort"
@@ -43,6 +45,136 @@ func RandomPension() *Pension {
 	p.FixPids()
 	p.Active = true
 	return p
+}
+
+func (t *Pension) UnmarshalBinary(data []byte) error {
+	_, err := t.UnmarshalBinaryData(data)
+	return err
+}
+
+func (p *Pension) UnmarshalBinaryData(data []byte) (newData []byte, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("[Pension] A panic has occurred while unmarshaling: %s", r)
+			return
+		}
+	}()
+
+	newData = data
+
+	newData, err = p.PensionID.UnmarshalBinaryData(newData)
+	if err != nil {
+		return data, err
+	}
+
+	u, err := primitives.BytesToUint32(newData[:4])
+	if err != nil {
+		return data, err
+	}
+	newData = newData[4:]
+
+	p.Transactions = make([]*Transaction, u)
+	var i uint32
+	for i = 0; i < u; i++ {
+		x := new(Transaction)
+		newData, err = x.UnmarshalBinaryData(newData)
+		if err != nil {
+			return data, err
+		}
+		p.Transactions[i] = x
+	}
+
+	newData, err = p.Company.UnmarshalBinaryData(newData)
+	if err != nil {
+		return data, err
+	}
+
+	newData, err = p.UniqueHash.UnmarshalBinaryData(newData)
+	if err != nil {
+		return data, err
+	}
+
+	newData, err = p.Docs.UnmarshalBinaryData(newData)
+	if err != nil {
+		return data, err
+	}
+
+	u, err = primitives.BytesToUint32(newData[:4])
+	if err != nil {
+		return data, err
+	}
+	p.Value = int(u)
+	newData = newData[4:]
+
+	newData, err = p.AuthKey.UnmarshalBinaryData(newData)
+	if err != nil {
+		return data, err
+	}
+
+	if newData[0] == 0xFF {
+		p.Active = true
+	} else {
+		p.Active = false
+	}
+	newData = newData[1:]
+	return
+}
+
+func (p *Pension) MarshalBinary() ([]byte, error) {
+	buf := new(bytes.Buffer)
+
+	data, err := p.PensionID.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	data = primitives.Uint32ToBytes(uint32(len(p.Transactions)))
+	buf.Write(data)
+
+	for _, t := range p.Transactions {
+		data, err := t.MarshalBinary()
+		if err != nil {
+			return nil, err
+		}
+		buf.Write(data)
+	}
+
+	data, err = p.Company.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	data, err = p.UniqueHash.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	data, err = p.Docs.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	data = primitives.Uint32ToBytes(uint32(p.Value))
+	buf.Write(data)
+
+	data, err = p.AuthKey.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	buf.Write(data)
+
+	switch p.Active {
+	case true:
+		buf.Write([]byte{0xFF})
+	case false:
+		buf.Write([]byte{0x00})
+	}
+
+	return buf.Next(buf.Len()), nil
 }
 
 func (p *Pension) LastInteraction() string {

@@ -162,6 +162,33 @@ func (db *BoltDB) PutInBatch(records []Record) error {
 	return nil
 }
 
+func (db *BoltDB) GetBatch(records []Record) ([][]byte, error) {
+	db.RLock()
+	defer db.RUnlock()
+
+	bat := make([][]byte, 0)
+	var v []byte
+	db.db.Batch(func(tx *bolt.Tx) error {
+		for _, r := range records {
+			b := tx.Bucket(r.Bucket)
+			if b == nil {
+				return nil
+			}
+			v = b.Get(r.Key)
+			if v == nil {
+				return nil
+			}
+			bat = append(bat, v)
+		}
+		return nil
+	})
+	if v == nil { // If the value is undefined, return nil
+		return nil, nil
+	}
+
+	return bat, nil
+}
+
 func (db *BoltDB) Clear(bucket []byte) error {
 	db.Lock()
 	defer db.Unlock()

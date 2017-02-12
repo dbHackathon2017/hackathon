@@ -11,6 +11,7 @@ import (
 var (
 	MAKE_TRANS bool = false
 	USE_DB     bool = false
+	FULL_CACHE bool = false
 )
 
 func main() {
@@ -18,6 +19,7 @@ func main() {
 		jesse     = flag.Bool("j", false, "Only use if you are jesse")
 		makeTrans = flag.Bool("t", false, "Turn this on if you want factom transactions made at bootup")
 		db        = flag.Bool("db", false, "Turn this on if you want to use db cache")
+		full      = flag.Bool("f", false, "Turn this on if you want to cache factom entries into db")
 		robin     = flag.Bool("r", false, "Only use if you are robin")
 	)
 
@@ -35,6 +37,9 @@ func main() {
 
 	if *db {
 		USE_DB = true
+		if *full {
+			FULL_CACHE = true
+		}
 	}
 
 	MAKE_TRANS = *makeTrans
@@ -44,7 +49,7 @@ func main() {
 	go func() {
 		<-c
 		if MainCompany != nil {
-			MainCompany.Save()
+			MainCompany.Save(GetCacheList(), FULL_CACHE)
 		}
 		os.Exit(1)
 	}()
