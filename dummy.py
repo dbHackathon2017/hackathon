@@ -35,15 +35,6 @@ def genRandomAdress():
 
 
 def gendummyDict():
-    docs = [
-        {
-            "path": "check.pdf",
-            "hash": genRandomHash(),
-            "timestamp": str(datetime.datetime.utcnow()),
-            "source": "NestEgg",
-            "location": "NestEgg"
-        }
-    ],
     params = {
         'firstname': genRandomName(0),
         "lastname": genRandomName(1),
@@ -51,7 +42,6 @@ def gendummyDict():
         "phone": genRandomPhone(),
         "ssn": genRandomNumberString(9),
         "acctnum": genRandomNumberString(10),
-        "docs": docs
     }
     pensionDict = {"request": "makepension", "params": params}
     return pensionDict
@@ -68,4 +58,4 @@ def genDummyData():
 if __name__ == "__main__":
     # genDummyData()
     r = requests.post('http://localhost:1337/POST', json=gendummyDict())
-    print(r)
+    print(r.raw)

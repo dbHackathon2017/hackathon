@@ -2,6 +2,7 @@ package primitives
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 
@@ -174,6 +175,14 @@ func (h *Hash) SetBytes(ni []byte) error {
 
 func (h *Hash) String() string {
 	return hex.EncodeToString(h.Bytes())
+}
+
+func RandomCryptoHash() *Hash {
+	b := make([]byte, 32)
+	rand.Read(b)
+	h := new(Hash)
+	h.SetBytes(b)
+	return h
 }
 
 func RandomHash() *Hash {

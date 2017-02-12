@@ -195,7 +195,7 @@ func (t *Transaction) GetUserTypeString() string {
 	} else if t.UserType == constants.USER_LIQUID_CONFIRMED {
 		return "Merge Finalized"
 	}
-	return "NA"
+	return "--"
 }
 
 func (t *Transaction) GetFactomTypeString() string {
@@ -208,7 +208,7 @@ func (t *Transaction) GetFactomTypeString() string {
 	} else if t.UserType == constants.FAC_LIQUID_CONFIRM {
 		return "Merge Finalized"
 	}
-	return "NA"
+	return "--"
 }
 
 func (a *Transaction) IsSameAs(b *Transaction) bool {

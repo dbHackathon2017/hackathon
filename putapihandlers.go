@@ -30,6 +30,7 @@ type PutDoc struct {
 
 func handleMakePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 	// penIDStr := r.FormValue("content")
+
 	type POSTMakePen struct {
 		Request string     `json:"request"`
 		Params  PutPension `json:"params,omitempty"`
@@ -39,6 +40,7 @@ func handleMakePension(w http.ResponseWriter, r *http.Request, data []byte) erro
 
 	err := json.Unmarshal(data, pr)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 

@@ -62,10 +62,11 @@ func RandomPenstionAndMetaData() *PensionAndMetadata {
 	return p
 }
 
-var PENSION_BUCKET []byte = []byte("Pensions") // Pension metadaa
-var PRIV_KEY []byte = []byte("Secret")
-var COMPANY_NAME []byte = []byte("CompName")
-var PENSION_CACHE []byte = []byte("CompName") // Pension data in factom
+var PENSION_ORDER []byte = []byte("PensionOrder") // Order of pensions to maitain same order
+var PENSION_BUCKET []byte = []byte("Pensions")    // Pension metadaa
+var PRIV_KEY []byte = []byte("Secret")            // Comp priv key
+var COMPANY_NAME []byte = []byte("CompName")      // Comp name
+var PENSION_CACHE []byte = []byte("CompName")     // Pension data in factom
 
 var lock sync.RWMutex
 
@@ -78,15 +79,25 @@ func (fc *FakeCompany) Save(penCache []common.Pension, full bool) {
 	defer lock.Unlock()
 	log.Println("Saving to db....")
 
+	orderedList := primitives.NewHashList()
 	for _, p := range fc.Pensions {
 		data, err := p.MarshalBinary()
 		if err != nil {
 			log.Printf("Failed to save pension %s\n", p.PensionID.String())
 		}
+		orderedList.AddHash(&p.PensionID)
 		err = fc.DB.Put(PENSION_BUCKET, p.PensionID.Bytes(), data)
 		if err != nil {
 			log.Printf("Failed to save pension %s\n", p.PensionID.String())
 		}
+	}
+	data, err := orderedList.MarshalBinary()
+	if err != nil {
+		log.Printf("Failed to save pension order \n")
+	}
+	err = fc.DB.Put(PENSION_ORDER, PENSION_ORDER, data)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	sec, err := fc.SigningKey.MarshalBinary()
@@ -147,24 +158,52 @@ func (fc *FakeCompany) LoadFromDB() {
 	lock.RLock()
 	defer lock.RUnlock()
 
-	/*keys, err := fc.DB.ListAllKeys(PENSION_BUCKET)
-	if err != nil {
-		log.Printf("Failed to load pensions\n")
-	}*/
+	stillNeed := true
+	keysData, err := fc.DB.Get(PENSION_ORDER, PENSION_ORDER)
+	if err == nil {
+		keys := primitives.NewHashList()
+		err := keys.UnmarshalBinary(keysData)
+		if err == nil {
+			list := keys.GetHashes()
+			/*keys, err := fc.DB.ListAllKeys(PENSION_BUCKET)
+			if err != nil {
+				log.Printf("Failed to load pensions\n")
+			}*/
 
-	fc.Pensions = make([]*PensionAndMetadata, 0)
+			fc.Pensions = make([]*PensionAndMetadata, 0)
 
-	fmt.Printf("Loading Pensions...\n")
-	dataSet, _, err := fc.DB.GetAll(PENSION_BUCKET)
-	for _, data := range dataSet {
-		t := new(PensionAndMetadata)
-		err = t.UnmarshalBinary(data)
-		if err != nil {
-			log.Printf("Failed to unmarshal pensionmetadata")
-			continue
+			fmt.Printf("Loading Pensions...\n")
+			for _, key := range list {
+				data, _ := fc.DB.Get(PENSION_BUCKET, key.Bytes())
+				t := new(PensionAndMetadata)
+				err = t.UnmarshalBinary(data)
+				if err != nil {
+					log.Printf("Failed to unmarshal pensionmetadata")
+					continue
+				}
+				fc.Pensions = append(fc.Pensions, t)
+			}
+			stillNeed = false
+		} else {
+			fmt.Println(err)
 		}
+	} else {
+		fmt.Println(err)
+	}
 
-		fc.Pensions = append(fc.Pensions, t)
+	if stillNeed {
+		fmt.Printf("Loading Pensions from backup...\n")
+		dataSet, _, err := fc.DB.GetAll(PENSION_BUCKET)
+		for _, data := range dataSet {
+			t := new(PensionAndMetadata)
+			err = t.UnmarshalBinary(data)
+			if err != nil {
+				log.Printf("Failed to unmarshal pensionmetadata")
+				continue
+			}
+
+			fc.Pensions = append(fc.Pensions, t)
+		}
 	}
 
 	data, err := fc.DB.Get(PRIV_KEY, PRIV_KEY)
@@ -206,7 +245,7 @@ func (fc *FakeCompany) LoadPenCacheFromDB() []common.Pension {
 	}
 
 	list := make([]common.Pension, 0)
-	fmt.Printf("Loading factom-pensions from cache...")
+	fmt.Printf("Loading factom-pensions from cache...\n")
 	dataSet, _, err := fc.FactomDB.GetAll(PENSION_CACHE)
 	if err != nil {
 		log.Println("Encountered error", err.Error())
@@ -254,7 +293,7 @@ func (fc *FakeCompany) CreatePension(fn, ln, addr, pn, ssn, acct string, docs pr
 	p.AuthKey = fc.SigningKey.Public
 	p.Value = 0
 	p.Company = fc.CompanyName
-	p.UniqueHash = *primitives.RandomHash()
+	p.UniqueHash = *primitives.RandomCryptoHash()
 
 	ec := write.GetECAddress()
 	_, err := write.SubmitPensionToFactom(p, ec)

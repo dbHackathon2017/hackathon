@@ -15,7 +15,7 @@ import (
 	"github.com/FactomProject/factom"
 	"github.com/dbHackathon2017/hackathon/common"
 	"github.com/dbHackathon2017/hackathon/common/constants"
-	"github.com/dbHackathon2017/hackathon/common/primitives"
+	//"github.com/dbHackathon2017/hackathon/common/primitives"
 	"github.com/dbHackathon2017/hackathon/company"
 	"github.com/dbHackathon2017/hackathon/factom-read"
 )
@@ -102,6 +102,18 @@ func loadCache(time.Time) {
 	log.Println("Updating memory cache...")
 	loading = true
 	//fmt.Println("Adding to cache")
+	for _, p := range MainCompany.Pensions {
+		pp := GetFromPensionCache(p.PensionID.String())
+		if pp == nil {
+			fpen, err := read.GetPensionFromFactom(p.PensionID)
+			if err != nil {
+				fmt.Println("ERR in load: " + err.Error())
+				continue
+			}
+			AddToPensionCache(fpen.PensionID.String(), *fpen)
+		}
+	}
+
 	for i, p := range MainCompany.Pensions {
 		//fmt.Printf("- #%d -", i)
 		var _ = i
@@ -126,13 +138,6 @@ func InitTemplate() {
 	TemplateMutex.Unlock()
 
 	PensionCache = make(map[string]common.Pension)
-}
-
-func delayed() {
-	err := MainCompany.Pensions[0].MoveChainTo(MainCompany.Pensions[1], "StevenMod", *primitives.RandomFileList(10))
-	if err != nil {
-		panic(err)
-	}
 }
 
 func ServeFrontEnd(port int) {
@@ -165,20 +170,19 @@ func ServeFrontEnd(port int) {
 				"http://altcoin.host:8090/search?input=" + penId.String() + "&type=chainhead")
 		}
 
-		for i := 0; i < amt; i++ {
-			MainCompany.Pensions[i].AddValue(10000, "Steven WOOT!", *primitives.RandomFileList(10), true)
-			MainCompany.Pensions[i].AddValue(2500, "Steven WOOT!", *primitives.RandomFileList(10), true)
-			MainCompany.Pensions[i].AddValue(-1111, "Steven WOOT!", *primitives.RandomFileList(10), true)
-			MainCompany.Pensions[i].AddValue(0, "Steven WOOT!", *primitives.RandomFileList(10), true)
-			MainCompany.Pensions[i].AddValue(5025, "Steven WOOT!", *primitives.RandomFileList(10), true)
-			MainCompany.Pensions[i].AddValue(6025, "Steven WOOT!", *primitives.RandomFileList(10), true)
-		}
-
-		go func() {
-			time.Sleep(15 * time.Second)
-			delayed()
-		}()
+		/*go func() {
+			time.Sleep(7 * time.Second)
+			for i := 0; i < amt; i++ {
+				MainCompany.Pensions[i].AddValue(10000, "Steven WOOT!", *primitives.RandomFileList(10), true)
+				MainCompany.Pensions[i].AddValue(2500, "Steven WOOT!", *primitives.RandomFileList(10), true)
+				MainCompany.Pensions[i].AddValue(-1111, "Steven WOOT!", *primitives.RandomFileList(10), true)
+				MainCompany.Pensions[i].AddValue(0, "Steven WOOT!", *primitives.RandomFileList(10), true)
+				MainCompany.Pensions[i].AddValue(5025, "Steven WOOT!", *primitives.RandomFileList(10), true)
+				MainCompany.Pensions[i].AddValue(6025, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			}
+		}()*/
 	}
+	go startFeeder()
 
 	go func() {
 		time.Sleep(5 * time.Second)
@@ -314,7 +318,7 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 	//	json	-- json object
 
 	//req := r.FormValue("request")
-	//fmt.Println(p.Request)
+	fmt.Println(p.Request)
 	switch p.Request {
 	case "on":
 		w.Write(jsonResp(true))

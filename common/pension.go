@@ -182,7 +182,7 @@ func (p *Pension) LastInteraction() string {
 		sort.Sort(TransList(p.Transactions))
 		return p.Transactions[0].Timestamp.Format(layout)
 	}
-	return "NA"
+	return "--"
 }
 
 func (p *Pension) FixPids() {
