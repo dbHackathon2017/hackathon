@@ -22,8 +22,9 @@ type FakeCompany struct {
 
 	Pensions []*PensionAndMetadata
 
-	DBPath string
-	DB     *BoltDB
+	DBPath   string
+	DB       *BoltDB
+	FactomDB *BoltDB
 }
 
 type PensionAndMetadata struct {
@@ -104,39 +105,39 @@ func (fc *FakeCompany) Save(penCache []common.Pension, full bool) {
 		log.Printf("Failed to save Company Name \n")
 	}
 
-	//if full {
-	recs := make([]Record, 0)
-	for _, p := range penCache {
-		data, err := p.MarshalBinary()
-		if err != nil {
-			log.Printf("Failed to save pension %s\n", p.PensionID.String())
-		}
+	if fc.FactomDB != nil {
+		recs := make([]Record, 0)
+		for _, p := range penCache {
+			data, err := p.MarshalBinary()
+			if err != nil {
+				log.Printf("Failed to save pension %s\n", p.PensionID.String())
+			}
 
-		if len(data) < 100 {
-			continue
+			if len(data) < 100 {
+				continue
+			}
+			rc := new(Record)
+			rc.Bucket = PENSION_CACHE
+			rc.Key = p.PensionID.Bytes()
+			rc.Data = data
+			recs = append(recs, *rc)
+			/*err = fc.DB.Put(PENSION_CACHE, p.PensionID.Bytes(), data)
+			if err != nil {
+				log.Printf("Failed to save pension %s\n", p.PensionID.String())
+			}*/
 		}
-		rc := new(Record)
-		rc.Bucket = PENSION_CACHE
-		rc.Key = p.PensionID.Bytes()
-		rc.Data = data
-		recs = append(recs, *rc)
-		/*err = fc.DB.Put(PENSION_CACHE, p.PensionID.Bytes(), data)
+		err = fc.FactomDB.PutInBatch(recs)
 		if err != nil {
-			log.Printf("Failed to save pension %s\n", p.PensionID.String())
-		}*/
+			log.Printf("Failed to save factom-pensions \n")
+		}
 	}
-	err = fc.DB.PutInBatch(recs)
-	if err != nil {
-		log.Printf("Failed to save factom-pensions \n")
-	}
-	//}
 
 }
 
 func (fc *FakeCompany) LoadFromDB() {
 	fmt.Print("Loading pensions from DB...")
 	if fc.DB == nil {
-		fc.DB = NewBoltDB("company_cache.db")
+		fc.DB = NewBoltDB("cache/company_cache.db")
 	}
 
 	lock.RLock()
@@ -196,9 +197,13 @@ func (fc *FakeCompany) LoadFromDB() {
 }
 
 func (fc *FakeCompany) LoadPenCacheFromDB() []common.Pension {
+	if fc.FactomDB == nil {
+		fc.FactomDB = NewBoltDB("cache/factom_cache.db")
+	}
+
 	list := make([]common.Pension, 0)
 	fmt.Printf("Loading factom-pensions from cache...")
-	dataSet, _, err := fc.DB.GetAll(PENSION_CACHE)
+	dataSet, _, err := fc.FactomDB.GetAll(PENSION_CACHE)
 	if err != nil {
 		log.Println("Encountered error", err.Error())
 		return nil

@@ -55,6 +55,7 @@ func main() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
+		fmt.Println("Closing gracefully and saving...")
 		if MainCompany != nil {
 			MainCompany.Save(GetCacheList(), FULL_CACHE)
 		}
