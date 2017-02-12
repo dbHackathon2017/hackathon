@@ -150,7 +150,8 @@ func ServeFrontEnd(port int) {
 
 	if MAKE_TRANS {
 		fmt.Println()
-		for i := 0; i < 5; i++ {
+		amt := 5
+		for i := 0; i < amt; i++ {
 			penId, err := MainCompany.CreateRandomPension()
 			if err != nil {
 				panic(err)
@@ -160,7 +161,7 @@ func ServeFrontEnd(port int) {
 				"http://altcoin.host:8090/search?input=" + penId.String() + "&type=chainhead")
 		}
 
-		for i := 0; i < 20; i++ {
+		for i := 0; i < amt; i++ {
 			MainCompany.Pensions[i].AddValue(100, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
