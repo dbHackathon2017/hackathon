@@ -27,7 +27,7 @@ func handleCompanyStats(w http.ResponseWriter, r *http.Request, data []byte) err
 		fpen := GetFromPensionCache(p.PensionID.String())
 		if fpen != nil {
 			cs.TotalTransactions += len(fpen.Transactions)
-			cs.TotalValue += fpen.Value
+			cs.TotalValue += valToString(fpen.Value)
 		}
 	}
 
