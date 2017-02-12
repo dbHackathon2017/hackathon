@@ -184,9 +184,12 @@ func (t *Transaction) GetUserTypeString() string {
 	if t.UserType == constants.USER_LIQUID_SEND {
 		return "Chain Liquidation"
 	} else if t.UserType == constants.USER_TRANS_DOC_CHANGE {
-		return "DocumentChange"
+		return "Document Change"
 	} else if t.UserType == constants.USER_TRANS_VAL_CHANGE {
-		return "ValueChange"
+		if t.ValueChange < 0 {
+			return "Withdraw"
+		}
+		return "Deposit"
 	} else if t.UserType == constants.USER_LIQUID_REQUEST {
 		return "Retquest Merge In"
 	} else if t.UserType == constants.USER_LIQUID_CONFIRMED {
@@ -199,10 +202,7 @@ func (t *Transaction) GetFactomTypeString() string {
 	if t.UserType == constants.FAC_LIQUID_SEND {
 		return "Chain Liquidation"
 	} else if t.UserType == constants.FAC_TRANS_VAL_CHANGE {
-		if t.ValueChange < 0 {
-			return "Withdraw"
-		}
-		return "Deposit"
+		return "ValueChange"
 	} else if t.UserType == constants.FAC_LIQUID_REQUEST {
 		return "Retquest Merge In"
 	} else if t.UserType == constants.FAC_LIQUID_CONFIRM {

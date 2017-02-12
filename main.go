@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -21,6 +23,7 @@ func main() {
 		db        = flag.Bool("db", false, "Turn this on if you want to use db cache")
 		full      = flag.Bool("f", false, "Turn this on if you want to cache factom entries into db")
 		robin     = flag.Bool("r", false, "Only use if you are robin")
+		debug     = flag.Bool("d", false, "Turn on debugging")
 	)
 
 	flag.Parse()
@@ -40,6 +43,10 @@ func main() {
 		if *full {
 			FULL_CACHE = true
 		}
+	}
+
+	if !(*debug) {
+		log.SetOutput(ioutil.Discard)
 	}
 
 	MAKE_TRANS = *makeTrans
