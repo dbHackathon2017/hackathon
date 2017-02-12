@@ -65,10 +65,23 @@ func submitTransactionToFactom(message string, trans *common.Transaction, ec *fa
 	e := new(factom.Entry)
 
 	ut := primitives.Uint32ToBytes(trans.UserType)
-	ft := primitives.Uint32ToBytes(uint32(trans.ValueChange))
+
+	neg := trans.ValueChange < 0
+	var val uint32
+	if trans.ValueChange < 0 {
+		val = uint32(-1 * trans.ValueChange)
+	}
+
+	ft := primitives.Uint32ToBytes(val)
 	person, err := trans.Person.MarshalBinary()
 	if err != nil {
 		return nil, err
+	}
+
+	if neg {
+		ft = append([]byte{0x01}, ft...)
+	} else {
+		ft = append([]byte{0x00}, ft...)
 	}
 
 	ts, err := trans.Timestamp.MarshalBinary()

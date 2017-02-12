@@ -131,12 +131,16 @@ func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
 	}
 	t.UserType = ut
 
-	valC, err := primitives.BytesToUint32(e.ExtIDs[2])
+	valC, err := primitives.BytesToUint32(e.ExtIDs[2][1:])
 	if err != nil {
 		log.Println("Valchange fail")
 		return nil
 	}
 	t.ValueChange = int(valC)
+
+	if e.ExtIDs[2][0] == 0x01 {
+		t.ValueChange = -1 * t.ValueChange
+	}
 
 	pid, err := primitives.BytesToHash(e.ExtIDs[3])
 	if err != nil {
