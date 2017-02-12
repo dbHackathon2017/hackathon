@@ -55,7 +55,7 @@ func RandomPenstionAndMetaData() *PensionAndMetadata {
 	p.LastName = random.RandStringOfSize(random.RandomIntBetween(0, 100))
 	p.Address = random.RandStringOfSize(random.RandomIntBetween(0, 100))
 	p.PhoneNumber = random.RandStringOfSize(random.RandomIntBetween(0, 100))
-	p.CompanyName = random.RandStringOfSize(random.RandomIntBetween(0, 100))
+	p.CompanyName = "NestEgg"
 	p.SSN = random.RandStringOfSize(random.RandomIntBetween(0, 100))
 	p.AccountNumber = random.RandStringOfSize(random.RandomIntBetween(0, 100))
 	p.Bucket = random.RandomBool()
@@ -275,7 +275,7 @@ func NewCompany(path string) *FakeCompany {
 
 func RandomFakeCompay() *FakeCompany {
 	fc := NewCompany("none")
-	fc.CompanyName = *primitives.RandomName()
+	fc.CompanyName = "NestEgg"
 	sec, _ := primitives.RandomPrivateKey()
 	fc.SigningKey = *sec
 	fc.Pensions = make([]*PensionAndMetadata, 0)
