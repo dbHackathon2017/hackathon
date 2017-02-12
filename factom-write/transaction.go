@@ -67,21 +67,25 @@ func submitTransactionToFactom(message string, trans *common.Transaction, ec *fa
 	ut := primitives.Uint32ToBytes(trans.UserType)
 
 	neg := trans.ValueChange < 0
-	var val uint32
-	if trans.ValueChange < 0 {
-		val = uint32(-1 * trans.ValueChange)
-	}
 
-	ft := primitives.Uint32ToBytes(val)
+	ft := primitives.Uint32ToBytes(trans.FactomType)
 	person, err := trans.Person.MarshalBinary()
 	if err != nil {
 		return nil, err
 	}
 
-	if neg {
-		ft = append([]byte{0x01}, ft...)
+	var val uint32
+	if trans.ValueChange < 0 {
+		val = uint32(-1 * trans.ValueChange)
 	} else {
-		ft = append([]byte{0x00}, ft...)
+		val = uint32(trans.ValueChange)
+	}
+
+	vb := primitives.Uint32ToBytes(val)
+	if neg {
+		vb = append([]byte{0x01}, vb...)
+	} else {
+		vb = append([]byte{0x00}, vb...)
 	}
 
 	ts, err := trans.Timestamp.MarshalBinary()
@@ -92,21 +96,22 @@ func submitTransactionToFactom(message string, trans *common.Transaction, ec *fa
 	e.ExtIDs = append(e.ExtIDs, []byte(message))           // 0
 	e.ExtIDs = append(e.ExtIDs, ut)                        // 1
 	e.ExtIDs = append(e.ExtIDs, ft)                        // 2
-	e.ExtIDs = append(e.ExtIDs, trans.PensionID.Bytes())   // 3
-	e.ExtIDs = append(e.ExtIDs, trans.ToPensionID.Bytes()) // 4
-	e.ExtIDs = append(e.ExtIDs, person)                    // 5
-	e.ExtIDs = append(e.ExtIDs, ts)                        // 6
+	e.ExtIDs = append(e.ExtIDs, vb)                        // 3
+	e.ExtIDs = append(e.ExtIDs, trans.PensionID.Bytes())   // 4
+	e.ExtIDs = append(e.ExtIDs, trans.ToPensionID.Bytes()) // 5
+	e.ExtIDs = append(e.ExtIDs, person)                    // 6
+	e.ExtIDs = append(e.ExtIDs, ts)                        // 7
 
 	buf := new(bytes.Buffer)
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 8; i++ {
 		buf.Write(e.ExtIDs[i])
 	}
 
 	msg := buf.Next(buf.Len())
 	sig := sigKey.Sign(msg)
 
-	e.ExtIDs = append(e.ExtIDs, sigKey.Public.Bytes()) // 7
-	e.ExtIDs = append(e.ExtIDs, sig)                   // 8
+	e.ExtIDs = append(e.ExtIDs, sigKey.Public.Bytes()) // 8
+	e.ExtIDs = append(e.ExtIDs, sig)                   // 9
 
 	trans.Docs.FixFiles()
 

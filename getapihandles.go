@@ -14,7 +14,7 @@ import (
 )
 
 func valToString(val int) string {
-	return fmt.Sprintf("€%d", val)
+	//return fmt.Sprintf("€%d", val)
 	valStr := "€0.00"
 	pre := ""
 	if val < 0 {

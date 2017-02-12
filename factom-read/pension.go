@@ -117,7 +117,7 @@ func buildValChangeTransactionsFromFactomEntry(e *factom.Entry, p *common.Pensio
 }
 
 func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
-	if len(e.ExtIDs) != 9 {
+	if len(e.ExtIDs) != 10 {
 		return nil
 	}
 
@@ -131,7 +131,14 @@ func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
 	}
 	t.UserType = ut
 
-	valC, err := primitives.BytesToUint32(e.ExtIDs[2][1:])
+	ft, err := primitives.BytesToUint32(e.ExtIDs[1])
+	if err != nil {
+		log.Println("Usetype fail")
+		return nil
+	}
+	t.FactomType = ft
+
+	valC, err := primitives.BytesToUint32(e.ExtIDs[3][1:])
 	if err != nil {
 		log.Println("Valchange fail")
 		return nil
@@ -142,7 +149,7 @@ func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
 		t.ValueChange = -1 * t.ValueChange
 	}
 
-	pid, err := primitives.BytesToHash(e.ExtIDs[3])
+	pid, err := primitives.BytesToHash(e.ExtIDs[4])
 	if err != nil {
 		log.Println("PID fail")
 		return nil
@@ -153,7 +160,7 @@ func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
 		return nil
 	}
 
-	toPid, err := primitives.BytesToHash(e.ExtIDs[4])
+	toPid, err := primitives.BytesToHash(e.ExtIDs[5])
 	if err != nil {
 		log.Println("PID fail")
 		return nil
@@ -161,7 +168,7 @@ func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
 	t.ToPensionID = *toPid
 
 	per := new(primitives.PersonName)
-	err = per.UnmarshalBinary(e.ExtIDs[5])
+	err = per.UnmarshalBinary(e.ExtIDs[6])
 	if err != nil {
 		log.Println("PersonName fail")
 		return nil
@@ -169,14 +176,14 @@ func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
 	t.Person = *per
 
 	ts := new(time.Time)
-	err = ts.UnmarshalBinary(e.ExtIDs[6])
+	err = ts.UnmarshalBinary(e.ExtIDs[7])
 	if err != nil {
 		log.Println("Timestamp fail")
 		return nil
 	}
 	t.Timestamp = *ts
 
-	pk, err := primitives.PublicKeyFromBytes(e.ExtIDs[7])
+	pk, err := primitives.PublicKeyFromBytes(e.ExtIDs[8])
 	if err != nil {
 		log.Println("Pubkey fail")
 		return nil
@@ -186,12 +193,12 @@ func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
 		return nil
 	}
 
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 8; i++ {
 		buf.Write(e.ExtIDs[i])
 	}
 
 	msg := buf.Next(buf.Len())
-	sig := e.ExtIDs[8]
+	sig := e.ExtIDs[9]
 
 	valid := pk.Verify(msg, sig)
 	if !valid {

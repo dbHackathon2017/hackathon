@@ -165,7 +165,7 @@ func ServeFrontEnd(port int) {
 
 		for i := 0; i < amt; i++ {
 			MainCompany.Pensions[i].AddValue(10000, "Steven WOOT!", *primitives.RandomFileList(10), true)
-			MainCompany.Pensions[i].AddValue(-2500, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(2500, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(2500, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(5025, "Steven WOOT!", *primitives.RandomFileList(10), true)
 			MainCompany.Pensions[i].AddValue(6025, "Steven WOOT!", *primitives.RandomFileList(10), true)
