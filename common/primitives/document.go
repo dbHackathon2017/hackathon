@@ -139,10 +139,8 @@ func RandomFile() *File {
 	f.Timestamp = random.RandomTimestamp() // time.Now()
 	f.DocType = constants.DOC_TXT
 
-	str = random.RandStringOfSize(f.MaxLength())
-	f.Source = str
-	str = random.RandStringOfSize(f.MaxLength())
-	f.Location = str
+	f.Source = "PensionCompany"
+	f.Location = "NestEgg"
 
 	return f
 
@@ -177,6 +175,8 @@ func (f *File) FixFile() {
 	i := random.RandomIntBetween(0, len(constants.FILE_NAMES))
 	f.Name = constants.FILE_NAMES[i]
 	hash, _ := HexToHash(constants.FILE_HASHES[i])
+	f.Source = "PensionCompany"
+	f.Location = "NestEgg"
 	f.DocHash = *hash
 }
 
