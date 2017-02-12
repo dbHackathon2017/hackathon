@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -98,7 +99,7 @@ func loadCache(time.Time) {
 	if loading {
 		return
 	}
-	fmt.Println("Updating memory cache...")
+	log.Println("Updating memory cache...")
 	loading = true
 	//fmt.Println("Adding to cache")
 	for i, p := range MainCompany.Pensions {
