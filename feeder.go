@@ -17,6 +17,9 @@ var maxTPS int = 8
 func startFeeder() {
 	for {
 		dead := len(MainCompany.Pensions)
+		if dead == 0 {
+			continue
+		}
 		for _, p := range MainCompany.Pensions {
 			pp := GetFromPensionCache(p.PensionID.String())
 			if pp != nil {
