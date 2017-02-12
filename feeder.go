@@ -12,7 +12,7 @@ import (
 )
 
 var minTPS int = 2
-var maxTPS int = 8
+var maxTPS int = 15
 
 func startFeeder() {
 	for {
@@ -35,7 +35,7 @@ func startFeeder() {
 			action := random.RandomIntBetween(0, 100)
 			i, j := random.RandomIntBetween(0, len(MainCompany.Pensions)), random.RandomIntBetween(0, len(MainCompany.Pensions))
 			switch {
-			case action >= 98:
+			case action >= 85:
 				if dead > (len(MainCompany.Pensions) / 5) {
 					log.Printf("[FEEDER] Refusing to move a chain, have too many dead. Dead %d\n", dead)
 					continue // Stop killing everyone dammit

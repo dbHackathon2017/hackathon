@@ -213,7 +213,7 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 
 	penStruct := new(LongPension)
 	penStruct.Penid = penID.String()
-	penStruct.Authority = metaPen.CompanyName
+	penStruct.Authority = "NestEgg"
 	penStruct.Value = valToString(factomPen.Value)
 	if !factomPen.Active {
 		penStruct.Value = "€0.00"
