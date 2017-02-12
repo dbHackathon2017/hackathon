@@ -40,6 +40,9 @@ type PensionAndMetadata struct {
 	SSN         string
 
 	AccountNumber string
+
+	// User flip
+	Bucket bool
 }
 
 func RandomPenstionAndMetaData() *PensionAndMetadata {
@@ -55,6 +58,7 @@ func RandomPenstionAndMetaData() *PensionAndMetadata {
 	p.CompanyName = random.RandStringOfSize(random.RandomIntBetween(0, 100))
 	p.SSN = random.RandStringOfSize(random.RandomIntBetween(0, 100))
 	p.AccountNumber = random.RandStringOfSize(random.RandomIntBetween(0, 100))
+	p.Bucket = random.RandomBool()
 	return p
 }
 
@@ -268,6 +272,7 @@ func (fc *FakeCompany) CreatePension(fn, ln, addr, pn, ssn, acct string, docs pr
 	pm.AccountNumber = acct
 
 	pm.PensionID = p.PensionID
+	pm.Bucket = random.RandomBool()
 	fc.Pensions = append(fc.Pensions, pm)
 
 	return p.PensionID, nil
@@ -309,6 +314,7 @@ func (fc *FakeCompany) CreateRandomPension() (primitives.Hash, error) {
 	pm.AccountNumber = random.RandStringOfSize(8)
 
 	pm.PensionID = p.PensionID
+	pm.Bucket = random.RandomBool()
 	fc.Pensions = append(fc.Pensions, pm)
 
 	return p.PensionID, nil

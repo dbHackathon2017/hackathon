@@ -47,7 +47,15 @@ type ShortPensions struct {
 	TotalTransactions string `json:"totaltransactions"`
 }
 
-func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
+func handleAllPensionsUser(w http.ResponseWriter, r *http.Request) error {
+	return handleAllPensions(w, r, true)
+}
+
+func handleAllPensionsCompany(w http.ResponseWriter, r *http.Request) error {
+	return handleAllPensions(w, r, false)
+}
+
+func handleAllPensions(w http.ResponseWriter, r *http.Request, user bool) error {
 	pens := MainCompany.Pensions
 	sPens := make([]ShortPensions, len(pens))
 	for i, sp := range sPens {
@@ -75,6 +83,10 @@ func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
 			sp.Lastint = "Unknown"
 			sp.TotalTransactions = "..."
 			sp.Active = true
+		}
+
+		if user {
+			sp.Active = pens[i].Bucket
 		}
 		sPens[i] = sp
 	}

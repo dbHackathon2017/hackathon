@@ -316,7 +316,12 @@ func HandlePOSTRequests(w http.ResponseWriter, r *http.Request) {
 	case "on":
 		w.Write(jsonResp(true))
 	case "all-pensions":
-		err := handleAllPensions(w, r)
+		err := handleAllPensionsCompany(w, r)
+		if err != nil {
+			w.Write(jsonError(err.Error()))
+		}
+	case "all-pensions-user":
+		err := handleAllPensionsUser(w, r)
 		if err != nil {
 			w.Write(jsonError(err.Error()))
 		}

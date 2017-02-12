@@ -50,6 +50,16 @@ func RandString() string {
 	return RandStringOfSize(rand.Intn(1000))
 }
 
+func RandomBool() bool {
+	switch RandomIntBetween(0, 1) {
+	case 0:
+		return false
+	case 1:
+		return true
+	}
+	return true
+}
+
 func RandomHexStringOfSize(n int) (string, error) {
 	if n%2 != 0 {
 		return "", fmt.Errorf("Must be even length")
