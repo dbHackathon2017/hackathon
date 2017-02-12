@@ -208,6 +208,7 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 	header.Phone = metaPen.PhoneNumber
 	header.Ssn = metaPen.SSN
 	header.Active = factomPen.Active
+	header.Company = "NestEgg"
 	holder.Header = *header
 
 	penStruct := new(LongPension)
