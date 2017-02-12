@@ -57,5 +57,6 @@ def genDummyData():
 
 if __name__ == "__main__":
     # genDummyData()
-    r = requests.post('http://localhost:1337/POST', json=gendummyDict())
-    print(r.raw)
+    for i in range(0, 35):
+        r = requests.post('http://localhost:1337/POST', json=gendummyDict())
+        print(r.raw)
