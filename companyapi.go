@@ -16,6 +16,8 @@ type CompanyStats struct {
 	TotalTransactions int    `json:"totaltransaction"`
 	TotalPensions     int    `json:"totalpension"`
 	TotalValue        string `json:"value"`
+	IncomeValue       string `json:"incomevalue"`
+	SavingsValue      string `json:"savingsvalue"`
 }
 
 func handleCompanyStats(w http.ResponseWriter, r *http.Request, data []byte) error {
@@ -24,14 +26,23 @@ func handleCompanyStats(w http.ResponseWriter, r *http.Request, data []byte) err
 	cs.TotalPensions = len(MainCompany.Pensions)
 
 	total := 0
+	incomeTotal := 0
+	savingsTotal := 0
 	for _, p := range MainCompany.Pensions {
 		fpen := GetFromPensionCache(p.PensionID.String())
 		if fpen != nil {
+			if p.Bucket {
+				incomeTotal += fpen.Value
+			} else {
+				savingsTotal += fpen.Value
+			}
 			total += fpen.Value
 			cs.TotalTransactions += len(fpen.Transactions)
 		}
 	}
 	cs.TotalValue = valToString(total)
+	cs.IncomeValue = valToString(incomeTotal)
+	cs.SavingsValue = valToString(savingsTotal)
 
 	w.Write(jsonResp(cs))
 	return nil
