@@ -13,6 +13,24 @@ import (
 	"github.com/dbHackathon2017/hackathon/factom-read"
 )
 
+func valToString(val int) string {
+	valStr := "€0.00"
+	pre := ""
+	if val < 0 {
+		val = -1 * val
+		pre = "-"
+	}
+	if val < 10 {
+		valStr = fmt.Sprintf("€0.0%d", val)
+	} else if val < 100 {
+		valStr = fmt.Sprintf("€0.%d", val)
+	} else {
+		tmp := fmt.Sprintf("%d", val)
+		valStr = fmt.Sprintf("€%s.%s", tmp[:len(valStr)-2], tmp[len(valStr)-2:])
+	}
+	return pre + valStr
+}
+
 // Get all pensions
 type ShortPensionsHolder struct {
 	Holder []ShortPensions `json:"pensions"`
@@ -25,6 +43,7 @@ type ShortPensions struct {
 	Lastint   string `json:"lastint"`
 	Lastname  string `json:"lastname"`
 	Active    bool   `json:"active"`
+	//TotalTransactions string `json:"totaltransactions"`
 }
 
 func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
@@ -50,8 +69,10 @@ func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
 		if fpen != nil {
 			sp.Lastint = fpen.LastInteraction()
 			sp.Active = fpen.Active
+			//sp.TotalTransactions = fmt.Sprintf("%d", len(fpen.Transactions))
 		} else {
 			sp.Lastint = "Unknown"
+			//sp.TotalTransactions = "..."
 			sp.Active = true
 		}
 		sPens[i] = sp
@@ -178,9 +199,10 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 	penStruct := new(LongPension)
 	penStruct.Penid = penID.String()
 	penStruct.Authority = metaPen.CompanyName
-	penStruct.Value = fmt.Sprintf("%d", factomPen.Value)
+
+	penStruct.Value = valToString(factomPen.Value)
 	if !factomPen.Active {
-		penStruct.Value = "0"
+		penStruct.Value = "€0.00"
 	}
 
 	transStruct := make([]Transaction, len(factomPen.Transactions))
@@ -192,7 +214,7 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 		sing.Usertype = t.GetUserTypeString()
 		sing.Pension = t.PensionID.String()
 		sing.ToPension = t.ToPensionID.String()
-		sing.Valchange = fmt.Sprintf("%d", t.ValueChange)
+		sing.Valchange = valToString(t.ValueChange)
 		sing.Timestamp = t.GetTimeStampFormatted()
 		sing.Bctimestamp = t.GetTimeStampFormatted()
 
@@ -298,7 +320,7 @@ func handleTransaction(w http.ResponseWriter, r *http.Request, data []byte) erro
 	sing.Usertype = t.GetUserTypeString()
 	sing.Pension = t.PensionID.String()
 	sing.ToPension = t.ToPensionID.String()
-	sing.Valchange = fmt.Sprintf("%d", t.ValueChange)
+	sing.Valchange = valToString(t.ValueChange)
 	sing.Timestamp = t.GetTimeStampFormatted()
 	sing.Bctimestamp = t.GetTimeStampFormatted()
 
