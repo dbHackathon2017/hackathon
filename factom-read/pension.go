@@ -148,6 +148,7 @@ func applyTransaction(e *factom.Entry, p *common.Pension) *common.Transaction {
 	if e.ExtIDs[2][0] == 0x01 {
 		t.ValueChange = -1 * t.ValueChange
 	}
+	fmt.Println(t.ValueChange)
 
 	pid, err := primitives.BytesToHash(e.ExtIDs[4])
 	if err != nil {
