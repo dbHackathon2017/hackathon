@@ -14,6 +14,7 @@ import (
 )
 
 func valToString(val int) string {
+	return fmt.Sprintf("€%d", val)
 	valStr := "€0.00"
 	pre := ""
 	if val < 0 {
@@ -26,7 +27,7 @@ func valToString(val int) string {
 		valStr = fmt.Sprintf("€0.%d", val)
 	} else {
 		tmp := fmt.Sprintf("%d", val)
-		valStr = fmt.Sprintf("€%s.%s", tmp[:len(valStr)-2], tmp[len(valStr)-2:])
+		valStr = fmt.Sprintf("€%s.%s", tmp[:len(tmp)-2], tmp[len(tmp)-2:])
 	}
 	return pre + valStr
 }
@@ -37,13 +38,13 @@ type ShortPensionsHolder struct {
 }
 
 type ShortPensions struct {
-	Acct      string `json:"acct"`
-	Firstname string `json:"firstname"`
-	PenID     string `json:"id"`
-	Lastint   string `json:"lastint"`
-	Lastname  string `json:"lastname"`
-	Active    bool   `json:"active"`
-	//TotalTransactions string `json:"totaltransactions"`
+	Acct              string `json:"acct"`
+	Firstname         string `json:"firstname"`
+	PenID             string `json:"id"`
+	Lastint           string `json:"lastint"`
+	Lastname          string `json:"lastname"`
+	Active            bool   `json:"active"`
+	TotalTransactions string `json:"totaltransactions"`
 }
 
 func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
@@ -69,10 +70,10 @@ func handleAllPensions(w http.ResponseWriter, r *http.Request) error {
 		if fpen != nil {
 			sp.Lastint = fpen.LastInteraction()
 			sp.Active = fpen.Active
-			//sp.TotalTransactions = fmt.Sprintf("%d", len(fpen.Transactions))
+			sp.TotalTransactions = fmt.Sprintf("%d", len(fpen.Transactions))
 		} else {
 			sp.Lastint = "Unknown"
-			//sp.TotalTransactions = "..."
+			sp.TotalTransactions = "..."
 			sp.Active = true
 		}
 		sPens[i] = sp
@@ -199,7 +200,6 @@ func handlePension(w http.ResponseWriter, r *http.Request, data []byte) error {
 	penStruct := new(LongPension)
 	penStruct.Penid = penID.String()
 	penStruct.Authority = metaPen.CompanyName
-
 	penStruct.Value = valToString(factomPen.Value)
 	if !factomPen.Active {
 		penStruct.Value = "€0.00"

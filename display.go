@@ -141,10 +141,12 @@ func ServeFrontEnd(port int) {
 	MainCompany = company.RandomFakeCompay()
 	if USE_DB {
 		MainCompany.LoadFromDB()
-		if FULL_CACHE {
+		if FULL_CACHE { // Load from DB before factom
 			go func() {
 				firsLoadLocal()
 			}()
+		} else { // Load from factom
+			ready_to_disp = true // yea, bad name
 		}
 	}
 
@@ -162,11 +164,11 @@ func ServeFrontEnd(port int) {
 		}
 
 		for i := 0; i < amt; i++ {
-			MainCompany.Pensions[i].AddValue(100, "Steven WOOT!", *primitives.RandomFileList(10), true)
-			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
-			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
-			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
-			MainCompany.Pensions[i].AddValue(25, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(10000, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(2500, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(2500, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(5025, "Steven WOOT!", *primitives.RandomFileList(10), true)
+			MainCompany.Pensions[i].AddValue(6025, "Steven WOOT!", *primitives.RandomFileList(10), true)
 		}
 
 		go func() {
