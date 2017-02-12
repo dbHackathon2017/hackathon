@@ -15,7 +15,8 @@ import (
 
 func valToString(val int) string {
 	//return fmt.Sprintf("€%d", val)
-	valStr := "€0.00"
+	currecy := "€"
+	valStr := "0.00"
 	pre := ""
 	if val < 0 {
 		val = -1 * val
@@ -29,7 +30,7 @@ func valToString(val int) string {
 		tmp := fmt.Sprintf("%d", val)
 		valStr = fmt.Sprintf("€%s.%s", tmp[:len(tmp)-2], tmp[len(tmp)-2:])
 	}
-	return pre + valStr
+	return currecy + pre + valStr
 }
 
 // Get all pensions
