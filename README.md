@@ -1,21 +1,25 @@
 # Run Instructions
 
-There is no binary to run. There is no main, only test functions to execute some code.
-I setup a remote factomd on 1 second blocks, so our entries go in immediatly. This entry credit
-key has lots of money in it to use.
+There is no binary to run, no main() function, only test functions to execute some sample code for demonstration purposes.
+A remote factomd instance has been deployed that blocks produces blocks every second, so submitted entries are added to the chain nearly immediately.
+The following entry credit key has lots of money in it to use for demonstration purposes:
 
 - Es3cpDrGJRZpJBqZ3PwdohDpmMcXqmr8PuN2yyzBdB2rZ2McEtu1
 - EC29nUzTTopMuwEHgPGZ8eBvTGEgzPHErbJU8HVPXxTvKjP37hK6
 
-factom-write/util.go : GetECAddress Returns this address
+factom-write/util.go : GetECAddress() will return this address.
 
-To use remote factomd
+To make use of the remote factomd instance, use the following function:
 
 ```
 factom.SetFactomdServer(constants.REMOTE_HOST)
 ```
 
-See factom-write pension_test.go for example
+See factom-write pension_test.go for an example of the usage of the function.
+
+# Requirements:
+
+Golang go (tested on version 1.6)
 
 # Factom Types
 
