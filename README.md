@@ -1,21 +1,21 @@
 # Run Instructions
 
 There is no binary to run, no main() function, only test functions to execute some sample code for demonstration purposes.
-A remote factomd instance has been deployed that blocks produces blocks every second, so submitted entries are added to the chain nearly immediately.
-The following entry credit keys have lots of money in it to use for demonstration purposes:
+A remote factomd instance with a local Factom chain has been deployed with blocks being produced every six seconds, so submitted entries are added to the chain nearly instantly.
 
-Steven's node:
+The following entry outputs contain lots of Factoids. Feel free to use them for demonstration purposes:
+
+Steven's instance:
 - Es3cpDrGJRZpJBqZ3PwdohDpmMcXqmr8PuN2yyzBdB2rZ2McEtu1
 - EC29nUzTTopMuwEHgPGZ8eBvTGEgzPHErbJU8HVPXxTvKjP37hK6
 
-Jeroen's node
+Jeroen's instance:
 - FA2Ucjw1pBzrCxDJP82yCbhzk9BFU2aWdb1VqitBot3mFAseW6Uo
 - FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf
 
-factom-write/util.go : GetECAddress() will return this address.
+factom-write/util.go : GetECAddress() will return these address.
 
-To make use of the remote factomd instance, use the following function:
-
+To make use of the remote factomd instance, execute the following function:
 ```
 factom.SetFactomdServer(constants.REMOTE_HOST)
 ```
@@ -43,7 +43,7 @@ Persistantly add $GOPATH to your system's environment variables:
 ```
 mkdir $HOME/go && printf "export PATH=$PATH:/usr/local/go/bin\nexport GOPATH=$HOME/go\nexport PATH=$PATH:$GOPATH/bin" >> ~/.profile
 ```
-Reload global system environment:
+Reload the global system environment:
 ```
 source ~/.profile
 ```
