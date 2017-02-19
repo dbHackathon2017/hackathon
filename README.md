@@ -2,10 +2,15 @@
 
 There is no binary to run, no main() function, only test functions to execute some sample code for demonstration purposes.
 A remote factomd instance has been deployed that blocks produces blocks every second, so submitted entries are added to the chain nearly immediately.
-The following entry credit key has lots of money in it to use for demonstration purposes:
+The following entry credit keys have lots of money in it to use for demonstration purposes:
 
+Steven's node:
 - Es3cpDrGJRZpJBqZ3PwdohDpmMcXqmr8PuN2yyzBdB2rZ2McEtu1
 - EC29nUzTTopMuwEHgPGZ8eBvTGEgzPHErbJU8HVPXxTvKjP37hK6
+
+Jeroen's node
+- FA2Ucjw1pBzrCxDJP82yCbhzk9BFU2aWdb1VqitBot3mFAseW6Uo
+- FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf
 
 factom-write/util.go : GetECAddress() will return this address.
 
@@ -17,13 +22,13 @@ factom.SetFactomdServer(constants.REMOTE_HOST)
 
 See factom-write/pension_test.go for an example of the usage of the function.
 
-# Requirements:
+# Requirements
 
 Golang go (tested with go version 1.7.4):
 ```
 apt-get install golang-go
 ```
-git (tested with go version 2.1.4):
+Git (tested with go version 2.1.4):
 ```
 sudo apt-get install git
 ```
@@ -71,6 +76,14 @@ Create and make use of custom factom configurations
 mkdir -p ~/.factom/m2/
 cp $GOPATH/src/github.com/FactomProject/factomd/factomd.conf ~/.factom/m2/
 ```
+
+Edit factomd.conf to make use of a LOCAL network and decrease the block confirmation time to 6 seconds for fast interactions with the chain.
+```
+nano ~/.factom/m2/factomd.conf
+;Network                               = LOCAL
+
+```
+
 
 # Factom Types
 
