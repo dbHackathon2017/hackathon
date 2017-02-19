@@ -3,7 +3,6 @@ import requests
 import random
 import json
 import string
-import datetime
 import os
 
 names_file = "names.txt"
@@ -11,6 +10,15 @@ names = open(names_file).read().splitlines()
 
 adresses_file = "adresses.txt"
 adresses = open(adresses_file).read().splitlines()
+
+
+def dump_json(data_dict, output_handle):
+    """
+    Dumps a python dictionary data-structure to JSON structured file
+    :param data_dict: python dictionary
+    :param output_handle: output file handler to write the JSON-data to
+    """
+    output_handle.write('{}\n'.format(json.dumps(data_dict, indent=4)))
 
 
 def genRandomHash():
@@ -51,12 +59,11 @@ def genDummyData():
     if not os.path.exists("dummy"):
         os.system("sudo mkdir dummy")
     for i in range(50):
-        f = open('dummy/dummy'+str(i)+'.json', 'w')
-        json.dump(gendummyDict(), f)
-
+        f = open('dummy/dummy'+str(i)+'.json', 'w+')
+        dump_json(gendummyDict(), f)
 
 if __name__ == "__main__":
     # genDummyData()
-    for i in range(0, 35):
+    for i in range(35):
         r = requests.post('http://localhost:1337/POST', json=gendummyDict())
         print(r.raw)

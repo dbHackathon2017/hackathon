@@ -24,6 +24,8 @@ See factom-write/pension_test.go for an example of the usage of the function.
 
 # Requirements
 
+Linux. Debian Jessie and Ubuntu 16.10 have been tested.
+
 Golang go (tested with go version 1.7.4):
 ```
 apt-get install golang-go
