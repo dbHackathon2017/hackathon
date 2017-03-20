@@ -9,10 +9,6 @@ Steven's instance:
 - Es3cpDrGJRZpJBqZ3PwdohDpmMcXqmr8PuN2yyzBdB2rZ2McEtu1
 - EC29nUzTTopMuwEHgPGZ8eBvTGEgzPHErbJU8HVPXxTvKjP37hK6
 
-Jeroen's instance:
-- FA2Ucjw1pBzrCxDJP82yCbhzk9BFU2aWdb1VqitBot3mFAseW6Uo
-- FA2DfCwFhYWYVcZ8hya9JGgwnMSCd3RwEqCyA9qJ6qBbqkeBarEf
-
 factom-write/util.go : GetECAddress() will return these address.
 
 To make use of the remote factomd instance, execute the following function:
@@ -34,13 +30,6 @@ Git (tested with go version 2.1.4):
 ```
 sudo apt-get install git
 ```
-Glide (tested with version 0.13.0-dev)
-```
-go get -u github.com/Masterminds/glide
-cp ~/go/bin/glide /usr/local/bin/
-```
-# Installing Factom
-
 Persistantly add $GOPATH to your system's environment variables:
 ```
 mkdir $HOME/go && printf "export PATH=$PATH:/usr/local/go/bin\nexport GOPATH=$HOME/go\nexport PATH=$PATH:$GOPATH/bin" >> ~/.profile
@@ -49,6 +38,12 @@ Reload the global system environment:
 ```
 source ~/.profile
 ```
+Glide (tested with version 0.13.0-dev)
+```
+go get -u github.com/Masterminds/glide
+cp ~/go/bin/glide /usr/local/bin/
+```
+# Installing Factom
 Download relevant factom source code
 ```
 git clone https://github.com/FactomProject/factomd $GOPATH/src/github.com/FactomProject/factomd
@@ -72,6 +67,8 @@ cd $GOPATH/src/github.com/FactomProject/enterprise-wallet
 glide install
 go install -v
 cd $GOPATH/src/github.com/FactomProject/factomd
+glide install
+go install -v
 ```
 Create and make use of custom factom configurations
 ```
